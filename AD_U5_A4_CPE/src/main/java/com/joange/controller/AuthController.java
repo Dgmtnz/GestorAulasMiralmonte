@@ -11,14 +11,19 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
 
 import com.joange.model.Usuario;
+import com.joange.model.UsuarioCurso;
+import com.joange.model.Curso;
 import com.joange.model.TipoUsuario;
 import com.joange.service.UsuarioService;
 import com.joange.service.TipoUsuarioService;
 import com.joange.util.FileUploadUtil;
+import com.joange.service.CursoService;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class AuthController {
@@ -30,6 +35,9 @@ public class AuthController {
     
     @Autowired
     private TipoUsuarioService tipoUsuarioService;
+    
+    @Autowired
+    private CursoService cursoService;
     
     @GetMapping("/login")
     public String showLoginForm(Model model, @RequestParam(required = false) Boolean registroExitoso) {
@@ -44,7 +52,13 @@ public class AuthController {
     public String login(@ModelAttribute Usuario usuario, HttpSession session, Model model) {
         try {
             if (usuarioService.autenticar(usuario.getEmail(), usuario.getContrasenya())) {
-                Usuario usuarioAutenticado = usuarioService.findByEmail(usuario.getEmail());
+                Optional<Usuario> usuarioOpt = usuarioService.findByEmail(usuario.getEmail());
+                if (!usuarioOpt.isPresent()) {
+                    model.addAttribute("error", "Usuario no encontrado");
+                    return "auth/login";
+                }
+                
+                Usuario usuarioAutenticado = usuarioOpt.get();
                 session.setAttribute("usuarioActual", usuarioAutenticado);
                 
                 if (usuarioService.esAdministrador(usuarioAutenticado)) {
@@ -90,14 +104,16 @@ public class AuthController {
     }
     
     @GetMapping("/registro")
-    public String showRegistroForm(Model model) {
+    public String mostrarFormularioRegistro(Model model) {
         model.addAttribute("usuario", new Usuario());
+        model.addAttribute("cursos", cursoService.findAll());
         return "auth/registro";
     }
     
     @PostMapping("/registro")
     public String registrarUsuario(
             @ModelAttribute Usuario usuario,
+            @RequestParam(required = false) List<Long> cursosIds,
             @RequestParam(required = false) MultipartFile fotoFile,
             @RequestParam(required = false) String masterPassword,
             @RequestParam(required = false) Boolean esAdmin,
@@ -116,7 +132,8 @@ public class AuthController {
             }
             
             // Verificar email y DNI
-            if (usuarioService.findByEmail(usuario.getEmail()) != null) {
+            Optional<Usuario> usuarioExistente = usuarioService.findByEmail(usuario.getEmail());
+            if (usuarioExistente.isPresent()) {
                 model.addAttribute("error", "El email ya está registrado");
                 return "auth/registro";
             }
@@ -138,8 +155,21 @@ public class AuthController {
             usuario.setFechaactivacion(new Date());
             usuario.setActivo(true);
             
-            // Inicializar la lista de cursos vacía
-            usuario.setCursos(new ArrayList<>());
+            // Asignar cursos seleccionados
+            if (cursosIds != null && !cursosIds.isEmpty()) {
+                List<UsuarioCurso> cursos = new ArrayList<>();
+                for (Long cursoId : cursosIds) {
+                    cursoService.findById(cursoId).ifPresent(curso -> {
+                        UsuarioCurso usuarioCurso = new UsuarioCurso();
+                        usuarioCurso.setCurso(curso);
+                        usuarioCurso.setUsuario(usuario);
+                        cursos.add(usuarioCurso);
+                    });
+                }
+                usuario.setUsuarioCursos(cursos);
+            } else {
+                usuario.setUsuarioCursos(new ArrayList<>());
+            }
             
             // Asignar tipo de usuario
             TipoUsuario tipoUsuario;

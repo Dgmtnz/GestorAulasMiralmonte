@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-GestorAulasApplication<AD_U5_A4_CPE>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.joange.GestorAulasApplication",
+      "projectName": "AD_U5_A4_CPE",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}

@@ -6,8 +6,6 @@ import javax.persistence.Embeddable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import javax.persistence.OneToMany;
-import java.util.List;
 
 @Embeddable
 @Data
@@ -20,7 +18,4 @@ public class UsuarioCursoId implements Serializable {
     
     @Column(name = "CURSOidcurso")
     private Long cursoId;
-
-    @OneToMany(mappedBy = "curso")
-    private List<UsuarioCurso> usuarios;
 } 

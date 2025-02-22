@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Seleccionar Aula - Gestor de Aulas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #800020;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+            --bg-light: #ffffff;
+            --bg-dark: #333333;
+            --card-light: #ffffff;
+            --card-dark: #444444;
+            --text-dark: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .card {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .card-title,
+        .dark-mode .card-text {
+            color: var(--text-dark);
+        }
+
+        .dark-mode .text-muted {
+            color: #adb5bd !important;
+        }
+
+        .navbar,
+        .footer {
+            background-color: var(--primary-color) !important;
+        }
+
+        /* Estilos específicos del footer de adminHome.html */
+        .footer {
+            margin-top: auto;
+            padding: 20px 0;
+            color: white;
+            background-color: var(--primary-color) !important;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer a:hover {
+            color: var(--warning-color);
+        }
+
+        .footer-logo {
+            height: 30px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar actualizado con el botón de modo oscuro -->
+    <nav class="navbar navbar-dark" style="background-color: var(--primary-color);">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <a class="navbar-brand" href="/homeAdmin">
+                    <img src="/images/miralmonte-logo.png" alt="Logo" class="logo">
+                    Gestor de Aulas
+                </a>
+                <nav aria-label="breadcrumb" class="ms-3">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/homeAdmin" class="text-white">Inicio</a></li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">Seleccionar Aula</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="d-flex align-items-center">
+                <button id="darkModeToggle" class="btn btn-outline-light me-2">
+                    <i class="bi bi-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="mb-4">Seleccionar Aula para Reserva</h2>
+        <div class="row row-cols-1 g-4">
+            <div th:each="aula : ${aulas}" class="col">
+                <div class="card h-100">
+                    <div class="row g-0">
+                        <div class="col-md-3">
+                            <div class="card-img-container" style="height: 250px; overflow: hidden;">
+                                <img th:if="${aula.foto != null and !aula.foto.empty}" th:src="${aula.foto}"
+                                    class="card-img-top" alt="Foto del aula"
+                                    style="object-fit: cover; width: 100%; height: 100%;">
+                                <img th:unless="${aula.foto != null and !aula.foto.empty}"
+                                    th:src="@{/images/aulas/default-aula.png}" class="card-img-top"
+                                    alt="Imagen por defecto" style="object-fit: cover; width: 100%; height: 100%;">
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h4 class="card-title" th:text="${aula.nombre}"></h4>
+                                        <p class="card-text" th:text="${aula.descripcion}"></p>
+                                        <dl class="row">
+                                            <dt class="col-sm-4">Planta:</dt>
+                                            <dd class="col-sm-8" th:text="${aula.planta.nombre}"></dd>
+
+                                            <dt class="col-sm-4">Capacidad:</dt>
+                                            <dd class="col-sm-8" th:text="${aula.capacidad}"></dd>
+
+                                            <dt class="col-sm-4">Tipo de Aula:</dt>
+                                            <dd class="col-sm-8" th:text="${aula.tipoAula.nombre}"></dd>
+
+                                            <dt class="col-sm-4">Nº Enchufes:</dt>
+                                            <dd class="col-sm-8" th:text="${aula.numOrdenadores}"></dd>
+                                        </dl>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Equipamiento</h5>
+                                        <ul class="list-group">
+                                            <li class="list-group-item">
+                                                <i
+                                                    th:class="${aula.tieneProyector} ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
+                                                Proyector
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i
+                                                    th:class="${aula.tieneAC} ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
+                                                Aire Acondicionado
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i
+                                                    th:class="${aula.tieneSmartTV} ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
+                                                Smart TV
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i
+                                                    th:class="${aula.tieneHDMI} ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
+                                                HDMI
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <a th:href="@{/reservas/crear/{id}(id=${aula.idaula})}" class="btn btn-primary">
+                                        <i class="bi bi-calendar-plus"></i> Reservar Aula
+                                    </a>
+                                    <span th:if="${aula.activo}" class="badge bg-success ms-2">Activo</span>
+                                    <span th:unless="${aula.activo}" class="badge bg-danger ms-2">Inactivo</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer actualizado con la estructura de adminHome.html -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center text-md-start">
+                    <span>Hecho en Miralmonte</span>
+                    <img src="/images/miralmonte-logo.png" alt="Logo Miralmonte" class="footer-logo">
+                </div>
+                <div class="col-md-4 text-center">
+                    <span>© 2024 Gestor de Aulas - IES Miralmonte</span>
+                </div>
+                <div class="col-md-4 text-center text-md-end">
+                    <a href="https://github.com/usuario1" target="_blank">
+                        <i class="bi bi-github"></i> Developer 1
+                    </a>
+                    <a href="https://github.com/usuario2" target="_blank">
+                        <i class="bi bi-github"></i> Developer 2
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts actualizados -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const darkModeToggle = document.getElementById("darkModeToggle");
+            const body = document.body;
+            const icon = darkModeToggle.querySelector("i");
+
+            // Recuperar el estado del modo oscuro
+            const isDarkMode = localStorage.getItem("darkMode") === "true";
+            if (isDarkMode) {
+                body.classList.add("dark-mode");
+                icon.classList.replace("bi-moon", "bi-sun");
+            }
+
+            darkModeToggle.addEventListener("click", function () {
+                body.classList.toggle("dark-mode");
+                const isDark = body.classList.contains("dark-mode");
+                localStorage.setItem("darkMode", isDark);
+
+                if (isDark) {
+                    icon.classList.replace("bi-moon", "bi-sun");
+                } else {
+                    icon.classList.replace("bi-sun", "bi-moon");
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

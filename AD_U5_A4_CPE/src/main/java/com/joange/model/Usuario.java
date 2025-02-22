@@ -63,7 +63,12 @@ public class Usuario {
     @JoinColumn(name = "TIPOUSUARIOidtipousuario", nullable = false)
     private TipoUsuario tipoUsuario;
 
-    @OneToMany(mappedBy = "usuario")
-    private List<UsuarioCurso> cursos = new ArrayList<>();
-    
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UsuarioCurso> usuarioCursos = new ArrayList<>();
+
+    // Método helper para mantener la sincronización bidireccional
+    public void addUsuarioCurso(UsuarioCurso usuarioCurso) {
+        usuarioCursos.add(usuarioCurso);
+        usuarioCurso.setUsuario(this);
+    }
 }

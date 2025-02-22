@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Panel de Administración - Gestor de Aulas</title>
@@ -12,6 +13,9 @@
             --warning-color: #ffc107;
             --bg-light: #ffffff;
             --bg-dark: #333333;
+            --card-light: #ffffff;
+            --card-dark: #444444;
+            --text-dark: #ffffff;
         }
 
         body {
@@ -23,6 +27,7 @@
 
         body.dark-mode {
             background-color: var(--bg-dark);
+            color: var(--text-dark);
         }
 
         .dark-mode .welcome-text {
@@ -33,7 +38,8 @@
             color: white;
         }
 
-        .navbar, .footer {
+        .navbar,
+        .footer {
             background-color: var(--primary-color) !important;
         }
 
@@ -118,7 +124,7 @@
             background-color: white !important;
             border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin: 20px 0;
         }
 
@@ -177,8 +183,80 @@
             color: var(--bg-light);
             border-bottom-color: var(--bg-light);
         }
+
+        /* Estilos para tablas en modo oscuro */
+        .dark-mode .table {
+            color: var(--text-dark);
+        }
+
+        .dark-mode .table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .table tbody td {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .table-striped tbody tr:nth-of-type(odd) td {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .dark-mode .table-hover tbody tr:hover td {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .table-light {
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .table-light th,
+        .dark-mode .table-light td {
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+        }
+
+        /* Estilos mejorados para tablas */
+        .table {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .table {
+            color: var(--text-dark);
+            background-color: var(--card-dark);
+        }
+
+        .dark-mode .table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .table tbody td,
+        .dark-mode .table tbody tr {
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .dark-mode .table-striped tbody tr:nth-of-type(odd) td {
+            background-color: inherit;
+        }
+
+        .dark-mode .table-hover tbody tr:hover td {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
@@ -194,7 +272,8 @@
                     <button class="btn btn-outline-light me-3" onclick="toggleDarkMode()">
                         <i class="bi bi-moon-fill"></i>
                     </button>
-                    <span class="navbar-text me-3" th:text="${session.usuarioActual.nombre + ' ' + session.usuarioActual.apellido}">
+                    <span class="navbar-text me-3"
+                        th:text="${session.usuarioActual.nombre + ' ' + session.usuarioActual.apellido}">
                     </span>
                     <a href="/logout" class="btn btn-light">Cerrar Sesión</a>
                 </div>
@@ -211,8 +290,8 @@
 
     <div class="container">
         <div class="user-profile">
-            <img th:src="${session.usuarioActual.foto != null ? session.usuarioActual.foto : '/images/default-user.png'}" 
-                 alt="Foto de perfil" class="user-image">
+            <img th:src="${session.usuarioActual.foto != null ? session.usuarioActual.foto : '/images/default-user.png'}"
+                alt="Foto de perfil" class="user-image">
             <h3 class="welcome-text" th:text="'¡Bienvenido, ' + ${session.usuarioActual.nombre} + '!'"></h3>
         </div>
 
@@ -230,14 +309,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Aquí irán las reservas de todos los usuarios -->
+                    <!-- Todas las Reservas -->
                     <tr th:each="reserva : ${todasReservas}">
                         <td th:text="${reserva.usuario.nombre}"></td>
                         <td th:text="${reserva.aula.nombre}"></td>
-                        <td th:text="${reserva.fecha}"></td>
-                        <td th:text="${reserva.horaInicio}"></td>
-                        <td th:text="${reserva.horaFin}"></td>
-                        <td th:text="${reserva.estado}"></td>
+                        <td th:text="${#dates.format(reserva.fechadesde, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${#dates.format(reserva.horadesde, 'HH:mm')}"></td>
+                        <td th:text="${#dates.format(reserva.horahasta, 'HH:mm')}"></td>
+                        <td>
+                            <span th:if="${reserva.curso != null}" th:text="'Curso: ' + ${reserva.curso.nombre}"></span>
+                            <span th:if="${reserva.curso == null}">Personal</span>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -256,19 +338,27 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Aquí irán las reservas del usuario actual -->
+                    <!-- Mis Reservas -->
                     <tr th:each="reserva : ${misReservas}">
                         <td th:text="${reserva.aula.nombre}"></td>
-                        <td th:text="${reserva.fecha}"></td>
-                        <td th:text="${reserva.horaInicio}"></td>
-                        <td th:text="${reserva.horaFin}"></td>
-                        <td th:text="${reserva.estado}"></td>
+                        <td th:text="${#dates.format(reserva.fechadesde, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${#dates.format(reserva.horadesde, 'HH:mm')}"></td>
+                        <td th:text="${#dates.format(reserva.horahasta, 'HH:mm')}"></td>
+                        <td>
+                            <span th:if="${reserva.curso != null}" th:text="'Curso: ' + ${reserva.curso.nombre}"></span>
+                            <span th:if="${reserva.curso == null}">Personal</span>
+                            <a th:href="@{/reservas/eliminar/{id}(id=${reserva.idreserva})}"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('¿Estás seguro de eliminar esta reserva?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <a href="/reservas/crear" class="new-reservation-btn">
+        <a href="/reservas/listar-aulas" class="new-reservation-btn">
             <i class="bi bi-plus-circle"></i>
             Nueva Reserva
         </a>
@@ -280,47 +370,34 @@
                 <i class="bi bi-calendar-check icon-large"></i>
                 Gestionar Reservas
             </a>
-            
+
             <!-- Edificios -->
-            <a href="/edificios/crear" class="admin-button">
-                <i class="bi bi-building-add icon-large"></i>
-                Crear Edificio
-            </a>
+
             <a href="/edificios/gestionar" class="admin-button">
                 <i class="bi bi-building-gear icon-large"></i>
                 Gestionar Edificios
             </a>
-            
+
             <!-- Plantas -->
-            <a href="/plantas/crear" class="admin-button">
-                <i class="bi bi-stack icon-large"></i>
-                Crear Planta
-            </a>
+
             <a href="/plantas/gestionar" class="admin-button">
                 <i class="bi bi-layers icon-large"></i>
                 Gestionar Plantas
             </a>
-            
+
             <!-- Aulas -->
-            <a href="/aulas/crear" class="admin-button">
-                <i class="bi bi-door-open icon-large"></i>
-                Crear Aula
-            </a>
+
             <a href="/aulas/gestionar" class="admin-button">
                 <i class="bi bi-door-open-fill icon-large"></i>
                 Gestionar Aulas
             </a>
-            
+
             <!-- Cursos -->
-            <a href="/cursos/crear" class="admin-button">
-                <i class="bi bi-journal-plus icon-large"></i>
-                Crear Curso
-            </a>
             <a href="/cursos/gestionar" class="admin-button">
                 <i class="bi bi-journal-text icon-large"></i>
                 Gestionar Cursos
             </a>
-            
+
             <!-- Usuarios -->
             <a href="/usuarios/gestionar" class="admin-button">
                 <i class="bi bi-people-fill icon-large"></i>
@@ -336,7 +413,10 @@
                     <span>Hecho en Miralmonte</span>
                     <img src="/images/miralmonte-logo.png" alt="Logo Miralmonte" class="footer-logo">
                 </div>
-                <div class="col-md-8 text-center text-md-end">
+                <div class="col-md-4 text-center">
+                    <span>© 2024 Gestor de Aulas - IES Miralmonte</span>
+                </div>
+                <div class="col-md-4 text-center text-md-end">
                     <a href="https://github.com/usuario1" target="_blank">
                         <i class="bi bi-github"></i> Developer 1
                     </a>
@@ -373,4 +453,5 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html> 
+
+</html>

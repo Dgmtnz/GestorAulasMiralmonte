@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestionar Aulas - Gestor de Aulas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #800020;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+            --bg-light: #ffffff;
+            --bg-dark: #333333;
+            --card-light: #ffffff;
+            --card-dark: #444444;
+            --text-dark: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .navbar,
+        .footer {
+            background-color: var(--primary-color) !important;
+        }
+
+        .logo {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .footer {
+            margin-top: auto;
+            padding: 20px 0;
+            color: white;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer a:hover {
+            color: var(--warning-color);
+        }
+
+        .footer-logo {
+            height: 30px;
+            margin-left: 10px;
+        }
+
+        .dark-mode .card {
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .table {
+            color: var(--text-dark);
+        }
+
+        .dark-mode .table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .table tbody td {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .table-striped tbody tr:nth-of-type(odd) td {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .dark-mode .table-hover tbody tr:hover td {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .modal-content {
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <a class="navbar-brand" href="/homeAdmin">
+                    <img src="/images/miralmonte-logo.png" alt="Logo" class="logo">
+                    Gestor de Aulas
+                </a>
+                <nav aria-label="breadcrumb" class="ms-3">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/homeAdmin" class="text-white">Inicio</a></li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">Gestión Aulas</li>
+                    </ol>
+                </nav>
+            </div>
+            <button id="darkModeToggle" class="btn btn-outline-light">
+                <i class="bi bi-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2>Gestionar Aulas</h2>
+                <a href="/aulas/crear" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Nueva Aula
+                </a>
+            </div>
+            <div class="card-body">
+                <div th:if="${mensajeExito}" class="alert alert-success" role="alert" th:text="${mensajeExito}"></div>
+                <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Foto</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Planta</th>
+                                <th>Capacidad</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="aula : ${aulas}">
+                                <td>
+                                    <div class="aula-image" style="width: 100px; height: 75px; overflow: hidden;">
+                                        <img th:if="${aula.foto}" th:src="${aula.foto}" class="img-fluid"
+                                            alt="Foto del aula" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <img th:unless="${aula.foto}" th:src="@{ /images/aulas/default-aula.png}"
+                                            class="img-fluid" alt="Imagen por defecto"
+                                            style="width: 100%; height: 100%; object-fit: cover;">
+                                    </div>
+                                </td>
+                                <td th:text="${aula.nombre}"></td>
+                                <td th:text="${aula.descripcion}"></td>
+                                <td th:text="${aula.planta.nombre}"></td>
+                                <td th:text="${aula.capacidad}"></td>
+                                <td>
+                                    <span th:if="${aula.activo}" class="badge bg-success">Activo</span>
+                                    <span th:unless="${aula.activo}" class="badge bg-danger">Inactivo</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a th:href="@{/aulas/ver/{id}(id=${aula.idaula})}"
+                                            class="btn btn-sm btn-info me-2">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </a>
+                                        <a th:href="@{/aulas/editar/{id}(id=${aula.idaula})}"
+                                            class="btn btn-sm btn-primary me-2">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                            th:data-bs-target="'#deleteModal' + ${aula.idaula}">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales de eliminación -->
+    <div th:each="aula : ${aulas}" th:id="'deleteModal' + ${aula.idaula}" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de que desea eliminar el aula
+                    <span th:text="${aula.nombre}" class="fw-bold"></span>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form th:action="@{/aulas/eliminar/{id}(id=${aula.idaula})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto">
+        <div class="container text-center">
+            <span>© 2024 Gestor de Aulas - IES Miralmonte</span>
+            <img src="/images/miralmonte-logo.png" alt="Logo Footer" class="footer-logo">
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const darkModeToggle = document.getElementById("darkModeToggle");
+            const body = document.body;
+
+            darkModeToggle.addEventListener("click", function () {
+                body.classList.toggle("dark-mode");
+            });
+        });
+    </script>
+</body>
+
+</html>

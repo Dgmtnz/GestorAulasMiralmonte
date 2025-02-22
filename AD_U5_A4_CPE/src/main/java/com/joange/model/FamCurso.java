@@ -24,6 +24,9 @@ public class FamCurso {
     @Column(name = "idfamcurso")
     private Long idfamcurso;
     
+    @Column(name = "nombre", nullable = false)
+    private String nombre;
+    
     @Column(nullable = false)
     private String descripcion;
     

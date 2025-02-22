@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ver Aula - Gestor de Aulas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #800020;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+            --bg-light: #ffffff;
+            --bg-dark: #333333;
+            --card-light: #ffffff;
+            --card-dark: #444444;
+            --text-dark: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .navbar,
+        .footer {
+            background-color: var(--primary-color) !important;
+        }
+
+        .logo {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .footer {
+            margin-top: auto;
+            padding: 20px 0;
+            color: white;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer a:hover {
+            color: var(--warning-color);
+        }
+
+        .footer-logo {
+            height: 30px;
+            margin-left: 10px;
+        }
+
+        .breadcrumb-item a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .breadcrumb-item.active {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .dark-mode .card {
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark" style="background-color: var(--primary-color);">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <a class="navbar-brand" href="/homeAdmin">
+                    <img src="/images/miralmonte-logo.png" alt="Logo" class="logo">
+                    Gestor de Aulas
+                </a>
+                <nav aria-label="breadcrumb" class="ms-3">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/homeAdmin">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="/aulas/gestionar">Gestión Aulas</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Ver Aula</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="d-flex align-items-center">
+                <button id="darkModeToggle" class="btn btn-outline-light me-2">
+                    <i class="bi bi-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h2>Detalles del Aula</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Información General</h4>
+                        <dl class="row">
+                            <dt class="col-sm-4">Nombre:</dt>
+                            <dd class="col-sm-8" th:text="${aula.nombre}"></dd>
+
+                            <dt class="col-sm-4">Descripción:</dt>
+                            <dd class="col-sm-8" th:text="${aula.descripcion}"></dd>
+
+                            <dt class="col-sm-4">Capacidad:</dt>
+                            <dd class="col-sm-8" th:text="${aula.capacidad}"></dd>
+
+                            <dt class="col-sm-4">Planta:</dt>
+                            <dd class="col-sm-8" th:text="${aula.planta.nombre}"></dd>
+
+                            <dt class="col-sm-4">Tipo de Aula:</dt>
+                            <dd class="col-sm-8" th:text="${aula.tipoAula.nombre}"></dd>
+
+                            <dt class="col-sm-4">Nº Enchufes:</dt>
+                            <dd class="col-sm-8" th:text="${aula.numOrdenadores}"></dd>
+
+                            <dt class="col-sm-4">Estado:</dt>
+                            <dd class="col-sm-8">
+                                <span th:if="${aula.activo}" class="badge bg-success">Activo</span>
+                                <span th:unless="${aula.activo}" class="badge bg-danger">Inactivo</span>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>Imagen del Aula</h4>
+                        <div class="aula-image-container">
+                            <img th:if="${aula.foto}" th:src="${aula.foto}" class="img-fluid rounded"
+                                alt="Foto del aula" style="max-height: 300px; object-fit: cover;">
+                            <p th:unless="${aula.foto}" class="text-muted">No hay imagen disponible</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <h4>Equipamiento</h4>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <i
+                                    th:class="${aula.tieneProyector} ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
+                                Proyector
+                            </li>
+                            <li class="list-group-item">
+                                <i
+                                    th:class="${aula.tieneAC} ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
+                                Aire Acondicionado
+                            </li>
+                            <li class="list-group-item">
+                                <i
+                                    th:class="${aula.tieneSmartTV} ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
+                                Smart TV
+                            </li>
+                            <li class="list-group-item">
+                                <i
+                                    th:class="${aula.tieneHDMI} ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
+                                HDMI
+                            </li>
+                            <li class="list-group-item">
+                                <i
+                                    th:class="${aula.tieneAppleTV} ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
+                                Apple TV
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a th:href="@{/aulas/gestionar}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                    <a th:href="@{/aulas/editar/{id}(id=${aula.idaula})}" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto">
+        <div class="container text-center">
+            <span>© 2024 Gestor de Aulas - IES Miralmonte</span>
+            <img src="/images/miralmonte-logo.png" alt="Logo Footer" class="footer-logo">
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const darkModeToggle = document.getElementById("darkModeToggle");
+            const body = document.body;
+
+            darkModeToggle.addEventListener("click", function () {
+                body.classList.toggle("dark-mode");
+            });
+        });
+    </script>
+</body>
+
+</html>

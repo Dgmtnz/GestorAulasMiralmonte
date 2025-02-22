@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Registro - Gestor de Aulas</title>
@@ -9,61 +10,71 @@
             max-width: 600px;
             margin: 50px auto;
             padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border-radius: 5px;
         }
     </style>
 </head>
+
 <body class="bg-light">
     <div class="container">
         <div class="registro-container bg-white">
             <h2 class="text-center mb-4">Registro de Usuario</h2>
-            
+
             <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}">
             </div>
-            
+
             <form th:action="@{/registro}" method="post" th:object="${usuario}" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="nombre" class="form-label">Nombre</label>
-                        <input type="text" class="form-control" id="nombre" th:field="*{nombre}" 
-                               required maxlength="30">
+                        <input type="text" class="form-control" id="nombre" th:field="*{nombre}" required
+                            maxlength="30">
                     </div>
-                    
+
                     <div class="col-md-6 mb-3">
                         <label for="apellido" class="form-label">Apellidos</label>
-                        <input type="text" class="form-control" id="apellido" th:field="*{apellido}" 
-                               required maxlength="150">
+                        <input type="text" class="form-control" id="apellido" th:field="*{apellido}" required
+                            maxlength="150">
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label for="dni" class="form-label">DNI</label>
-                    <input type="text" class="form-control" id="dni" th:field="*{dni}" 
-                           required maxlength="9" pattern="[0-9]{8}[A-Za-z]{1}">
+                    <input type="text" class="form-control" id="dni" th:field="*{dni}" required maxlength="9"
+                        pattern="[0-9]{8}[A-Za-z]{1}">
                 </div>
 
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" th:field="*{email}" 
-                           required maxlength="200" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+                    <input type="email" class="form-control" id="email" th:field="*{email}" required maxlength="200"
+                        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
                 </div>
 
                 <div class="mb-3">
                     <label for="contrasenya" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="contrasenya" th:field="*{contrasenya}" 
-                           required maxlength="8">
+                    <input type="password" class="form-control" id="contrasenya" th:field="*{contrasenya}" required
+                        maxlength="8">
                 </div>
 
                 <div class="mb-3">
                     <label for="telefono" class="form-label">Teléfono</label>
-                    <input type="tel" class="form-control" id="telefono" th:field="*{telefono}" 
-                           maxlength="9" pattern="[0-9]{9}">
+                    <input type="tel" class="form-control" id="telefono" th:field="*{telefono}" maxlength="9"
+                        pattern="[0-9]{9}">
                 </div>
 
                 <div class="mb-3">
                     <label for="foto" class="form-label">Foto de perfil</label>
                     <input type="file" class="form-control" id="foto" name="fotoFile" accept="image/*">
+                </div>
+
+                <div class="mb-3">
+                    <label for="cursos" class="form-label">Cursos</label>
+                    <select multiple class="form-select" id="cursos" name="cursosIds">
+                        <option value="">Seleccione los cursos...</option>
+                        <option th:each="curso : ${cursos}" th:value="${curso.idcurso}" th:text="${curso.nombre}">
+                        </option>
+                    </select>
                 </div>
 
                 <div class="mb-3 form-check">
@@ -83,9 +94,10 @@
     </div>
 
     <script>
-        document.getElementById('esAdmin').addEventListener('change', function() {
+        document.getElementById('esAdmin').addEventListener('change', function () {
             document.getElementById('masterPasswordDiv').classList.toggle('d-none', !this.checked);
         });
     </script>
 </body>
-</html> 
+
+</html>

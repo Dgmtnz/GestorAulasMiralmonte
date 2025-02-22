@@ -37,7 +37,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
     
     @Override
-    public Usuario findByEmail(String email) {
+    public Optional<Usuario> findByEmail(String email) {
         return usuarioRepository.findByEmail(email);
     }
     
@@ -69,10 +69,10 @@ public class UsuarioServiceImpl implements UsuarioService {
     
     @Override
     public boolean autenticar(String email, String contrasenya) {
-        Usuario usuario = findByEmail(email);
-        return usuario != null && 
-               usuario.getActivo() && 
-               usuario.getContrasenya().equals(contrasenya);
+        Optional<Usuario> usuarioOpt = findByEmail(email);
+        return usuarioOpt.isPresent() && 
+               usuarioOpt.get().getActivo() && 
+               usuarioOpt.get().getContrasenya().equals(contrasenya);
     }
     
     @Override

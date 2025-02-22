@@ -7,7 +7,7 @@ import com.joange.model.Usuario;
 public interface UsuarioService {
     List<Usuario> findAll();
     Optional<Usuario> findByIdusuario(Long idusuario);
-    Usuario findByEmail(String email);
+    Optional<Usuario> findByEmail(String email);
     Usuario findByDni(String dni);
     Usuario save(Usuario usuario);
     void deleteByIdusuario(Long idusuario);

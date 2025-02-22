@@ -57,4 +57,7 @@ public class Aula {
     
     @Column(name = "appletv", nullable = false)
     private Boolean tieneAppleTV;
+
+    @OneToMany(mappedBy = "aula", fetch = FetchType.LAZY)
+    private List<Reserva> reservas;
 } 

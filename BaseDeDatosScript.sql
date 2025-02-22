@@ -236,34 +236,3 @@ BEGIN
     WHERE idplanta = OLD.PLANTAidplanta;
 END;//
 DELIMITER ;
-
--- Tipos de Usuario
-INSERT INTO TIPOUSUARIO (nombre, descripcion, activo) VALUES
-('ADMIN', 'Administrador del sistema', true),
-('USER', 'Usuario regular', true);
-
--- Tipos de Aula
-INSERT INTO TIPOAULA (nombre, descripcion, activo) VALUES
-('Aula Ordinaria', 'Aula de uso general para clases regulares', true),
-('Aula Específica', 'Aula equipada para usos específicos como laboratorios o talleres', true),
-('Otros', 'Otros tipos de espacios educativos', true);
-
--- Uso de Aula
-INSERT INTO USOAULA (nombre, descripcion, activo) VALUES
-('Docencia', 'Uso para actividades docentes', true),
-('Administrativo', 'Uso para actividades administrativas', true),
-('Otros', 'Otros usos', true);
-
--- SubUso de Aula
-INSERT INTO SUBUSOAULA (nombre, descripcion, activo, USOAULAiduso) VALUES
-('Clases Teóricas', 'Para impartir clases teóricas', true, 1),
-('Laboratorios', 'Para prácticas y experimentos', true, 1),
-('Talleres', 'Para actividades prácticas', true, 1),
-('Oficinas', 'Para trabajo administrativo', true, 2);
-
--- Familia de Cursos
-INSERT INTO FAMCURSO (nombre, descripcion, activo, SUBUSOAULAidsubuso) VALUES
-('Bachillerato', 'Cursos de bachillerato', true, 1),
-('Formación Profesional', 'Ciclos formativos de FP', true, 1),
-('ESO', 'Educación Secundaria Obligatoria', true, 1),
-('Otros', 'Otros tipos de formación', true, 1);

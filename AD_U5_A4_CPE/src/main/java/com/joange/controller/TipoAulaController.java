@@ -27,7 +27,7 @@ public class TipoAulaController {
         try {
             tipoAulaService.save(tipoAula);
             redirectAttributes.addFlashAttribute("mensaje", "Tipo de aula creado exitosamente");
-            return "redirect:/homeAdmin";
+            return "redirect:/tipoaulas/gestionar";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al crear el tipo de aula: " + e.getMessage());
             return "redirect:/tipoaulas/crear";
