@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Edificio - Gestor de Aulas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #800020;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+        }
+        
+        .form-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #600018;
+            border-color: #600018;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-dark" style="background-color: var(--primary-color);">
+        <div class="container">
+            <a class="navbar-brand" href="/homeAdmin">
+                <img src="/images/miralmonte-logo.png" alt="Logo" class="logo" style="height: 40px;">
+                Gestor de Aulas
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="text-center">Crear Nuevo Edificio</h2>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+                        <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+
+                        <form th:action="@{/edificios/guardar}" method="post" th:object="${edificio}" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nombre" 
+                                       th:field="*{nombre}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="descripcion" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="descripcion" 
+                                          th:field="*{descripcion}" rows="3"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="npuertasacceso" class="form-label">Número de Puertas de Acceso</label>
+                                <input type="number" class="form-control" id="npuertasacceso" 
+                                       th:field="*{npuertasacceso}" required min="1">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="ubicacion" class="form-label">Ubicación</label>
+                                <input type="text" class="form-control" id="ubicacion" 
+                                       th:field="*{ubicacion}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="foto" class="form-label">Foto</label>
+                                <input type="file" class="form-control" id="foto" name="fotoFile" 
+                                       accept="image/*">
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="activo" 
+                                       th:field="*{activo}">
+                                <label class="form-check-label" for="activo">Activo</label>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Guardar Edificio</button>
+                                <a href="/homeAdmin" class="btn btn-secondary">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

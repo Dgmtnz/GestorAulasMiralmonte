@@ -1,0 +1,35 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Título principal */
+h1 {
+    color: #941100;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+/* Estilos de enlaces */
+div {
+    margin: 10px;
+}
+
+div a {
+    text-decoration: none;
+    font-size: 18px;
+    background-color: #941100;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background 0.3s, transform 0.2s;
+    display: inline-block;
+}
+
+div a:hover {
+    background-color: #e74c3c;
+    transform: scale(1.05);
+}

@@ -1,0 +1,89 @@
+Práctica Evaluable: Gestión de Reservas
+de Aulas en un Colegio
+Contexto
+En esta práctica, se desarrollará una aplicación web utilizando Spring Boot para
+gestionar las reservas de aulas en un colegio. Se considerarán dos roles principales:
+
+ Administrador: Responsable de la gestión de aulas, usuarios, reservas y cursos.
+
+ Usuario Normal: Puede consultar la disponibilidad de aulas y realizar reservas.
+El propósito de esta práctica es aplicar conceptos de Spring Boot, JPA, Thymeleaf,
+Spring Security y el manejo de bases de datos en un entorno estructurado.
+Puntuación (10 puntos)
+La práctica se divide en niveles progresivos de complejidad. Cada sección completada
+sumará puntos hasta alcanzar un total de 10.
+Nivel 1: Configuración del Proyecto (1 punto)
+
+
+Creación de un proyecto en Spring Boot con las siguientes dependencias:
+o Spring Web
+o Spring Data JPA
+o Spring Security (Medio Punto Extra)
+o Thymeleaf
+o Lombok (Medio punto Extra)
+o Base de datos H2/PostgreSQL/MySQL
+Configuración de la conexión en application.properties.
+Nivel 2: Modelado de Base de Datos (1 punto)
+
+
+Definición de las entidades utilizando JPA:
+o
+ Aula
+o
+ Reserva
+o
+ Usuario
+o
+ TipoUsuario
+o
+ Y las restantes….
+Implementación de relaciones con @OneToMany y @ManyToOne.
+Nivel 3: Repositorios JPA (1 punto)
+
+ Creación de interfaces JpaRepository para cada entidad.
+Nivel 4: Servicios y Lógica de Negocio (1 punto)
+
+ Implementación de la capa de servicios para gestionar aulas, usuarios y reservas.
+Nivel 5: Controladores y Endpoints (1 punto)
+
+ Creación de controladores REST con métodos GET, POST, PUT y DELETE
+Nivel 7: Seguridad con Login usuario y contraseña.(0.5 puntos)
+Nivel 7.1: Seguridad con Spring Security (0.5 puntos) si se hace se le suma
+el otro 0.5
+
+ Implementación de roles Administrador y Usuario Normal.
+(OBLIGATORIO)
+
+ Restricción de acceso a las funciones de administración.
+
+ Configuración de autenticación y cierre de sesión con Spring Security.
+Nivel 8: Gestión de Reservas (1 puntos) OBLIGATORIO
+
+ Permitir que los usuarios realicen reservas de aulas disponibles.
+
+ Implementación de validaciones para evitar reservas en aulas ya ocupadas.
+Nivel 9: Panel de Administración (1 punto) OBLIGATORIO
+
+ Creación de un panel de administración para la gestión de aulas, reservas y
+usuarios.
+Nivel 10: Funcionalidades Adicionales (2 puntos)
+
+ Implementación de un sistema de búsqueda y filtrado de aulas por
+características.
+
+ Filtros de búsqueda como los horarios desglosados, un calendario, y que se
+muestren los disponibles y no disponibles será OBLIGATORIO
+
+ Mejora de la interfaz utilizando Bootstrap (opcional) ya sabéis cuanto más
+bonito mejor.
+Entrega
+
+
+
+Subida del código a un repositorio en GitHub.
+Inclusión de un archivo README.md con las instrucciones necesarias para la
+ejecución de la aplicación.
+Fecha límite: 23/02/2025. A las 23:59. Cada hora que pase se restará un
+punto de la nota final
+Cualquier duda o consulta deberá ser comunicada por correo o en clase los días que nos
+quedan.
