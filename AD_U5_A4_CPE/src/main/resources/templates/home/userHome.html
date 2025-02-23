@@ -112,10 +112,8 @@
         }
 
         .table-container {
-            background-color: white !important;
             border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 0px;
             margin: 20px 0;
         }
 
@@ -181,6 +179,14 @@
             background-color: var(--card-dark);
         }
 
+        .table tbody {
+            color: black;
+        }
+
+        .dark-mode .table tbody {
+            color: white;
+        }
+
         .dark-mode .table thead th {
             background-color: var(--primary-color);
             color: white;
@@ -236,6 +242,60 @@
             transform: translateY(-2px);
             opacity: 0.9;
             color: white;
+        }
+
+        .table {
+            border: 1px solid #dee2e6;
+            background-color: var(--card-light);
+        }
+
+        .table thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dark-mode .table {
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+            border: 1px solid #444;
+        }
+
+        .dark-mode .table tbody tr:hover {
+            background-color: #555;
+        }
+
+        .table-container {
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-group .btn {
+            padding: 0.25rem 0.5rem;
+        }
+
+        .btn-group .btn i {
+            font-size: 0.875rem;
+        }
+
+        /* Estilos para tablas en ambos modos */
+        .table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .table tbody {
+            color: black;
         }
     </style>
 </head>
@@ -307,47 +367,95 @@
             </table>
         </div>
 
-        <h4 class="section-title">Mis Reservas</h4>
-        <div class="table-container">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Aula</th>
-                        <th>Fecha</th>
-                        <th>Hora Inicio</th>
-                        <th>Hora Fin</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="reserva : ${misReservas}">
-                        <td th:text="${reserva.aula.nombre}"></td>
-                        <td th:text="${#dates.format(reserva.fechadesde, 'dd/MM/yyyy')}"></td>
-                        <td th:text="${#dates.format(reserva.horadesde, 'HH:mm')}"></td>
-                        <td th:text="${#dates.format(reserva.horahasta, 'HH:mm')}"></td>
-                        <td>
-                            <span th:if="${reserva.curso != null}" th:text="'Curso: ' + ${reserva.curso.nombre}"></span>
-                            <span th:if="${reserva.curso == null}">Personal</span>
-                        </td>
-                        <td>
-                            <div class="btn-group" role="group">
-                                <a th:href="@{/reservas/editar/{id}(id=${reserva.idreserva})}"
-                                    class="btn btn-warning btn-sm me-1">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form th:action="@{/reservas/eliminar/{id}(id=${reserva.idreserva})}" 
-                                      method="post" style="display: inline;"
-                                      onsubmit="return confirm('¿Estás seguro de eliminar esta reserva?')">
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="container mt-4">
+            <h4 class="section-title">Mis Reservas Personales</h4>
+            <div class="table-container">
+                <table class="table">
+                    <!-- Tabla de reservas personales -->
+                    <thead>
+                        <tr>
+                            <th>Aula</th>
+                            <th>Fecha</th>
+                            <th>Hora Inicio</th>
+                            <th>Hora Fin</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="reserva : ${reservasPersonales}">
+                            <td th:text="${reserva.aula.nombre}"></td>
+                            <td th:text="${#dates.format(reserva.fechadesde, 'dd/MM/yyyy')}"></td>
+                            <td th:text="${#dates.format(reserva.horadesde, 'HH:mm')}"></td>
+                            <td th:text="${#dates.format(reserva.horahasta, 'HH:mm')}"></td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a th:href="@{/reservas/editar/{id}(id=${reserva.idreserva})}"
+                                        class="btn btn-warning btn-sm me-1"
+                                        th:classappend="${reserva.usuario.idusuario != session.usuarioActual.idusuario ? 'disabled' : ''}"
+                                        onclick="return validateEdit(this, event)"
+                                        th:data-owner="${reserva.usuario.idusuario == session.usuarioActual.idusuario}">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form th:action="@{/reservas/eliminar/{id}(id=${reserva.idreserva})}" method="post"
+                                        style="display: inline;" th:onsubmit="return confirm(${reserva.usuario.idusuario == session.usuarioActual.idusuario} ? 
+                                            '¿Estás seguro de eliminar esta reserva?' : 
+                                            'No puedes eliminar una reserva que no hayas creado tú')">
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                            th:disabled="${reserva.usuario.idusuario != session.usuarioActual.idusuario}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4 class="section-title">Reservas de mis Cursos</h4>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Curso</th>
+                            <th>Aula</th>
+                            <th>Fecha</th>
+                            <th>Hora Inicio</th>
+                            <th>Hora Fin</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="reserva : ${reservasCursos}">
+                            <td th:text="${reserva.curso.nombre}"></td>
+                            <td th:text="${reserva.aula.nombre}"></td>
+                            <td th:text="${#dates.format(reserva.fechadesde, 'dd/MM/yyyy')}"></td>
+                            <td th:text="${#dates.format(reserva.horadesde, 'HH:mm')}"></td>
+                            <td th:text="${#dates.format(reserva.horahasta, 'HH:mm')}"></td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a th:href="@{/reservas/editar/{id}(id=${reserva.idreserva})}"
+                                        class="btn btn-warning btn-sm me-1"
+                                        th:classappend="${reserva.usuario.idusuario != session.usuarioActual.idusuario ? 'disabled' : ''}"
+                                        onclick="return validateEdit(this, event)"
+                                        th:data-owner="${reserva.usuario.idusuario == session.usuarioActual.idusuario}">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form th:action="@{/reservas/eliminar/{id}(id=${reserva.idreserva})}" method="post"
+                                        style="display: inline;" th:onsubmit="return confirm(${reserva.usuario.idusuario == session.usuarioActual.idusuario} ? 
+                                            '¿Estás seguro de eliminar esta reserva?' : 
+                                            'No puedes eliminar una reserva que no hayas creado tú')">
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                            th:disabled="${reserva.usuario.idusuario != session.usuarioActual.idusuario}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="action-buttons">
@@ -406,8 +514,42 @@
         document.querySelector('.btn-outline-light').addEventListener('click', () => {
             localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         });
+
+        function validateEdit(element, event) {
+            if (!element.getAttribute('data-owner') || element.getAttribute('data-owner') === 'false') {
+                event.preventDefault();
+                alert('No puedes editar una reserva que no hayas creado tú');
+                return false;
+            }
+            return true;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const darkModeToggle = document.getElementById("darkModeToggle");
+            const body = document.body;
+            const icon = darkModeToggle.querySelector("i");
+
+            // Recuperar el estado del modo oscuro
+            const isDarkMode = localStorage.getItem("darkMode") === "true";
+            if (isDarkMode) {
+                body.classList.add("dark-mode");
+                icon.classList.replace("bi-moon", "bi-sun");
+            }
+
+            darkModeToggle.addEventListener("click", function () {
+                body.classList.toggle("dark-mode");
+                const isDark = body.classList.contains("dark-mode");
+                localStorage.setItem("darkMode", isDark);
+
+                if (isDark) {
+                    icon.classList.replace("bi-moon", "bi-sun");
+                } else {
+                    icon.classList.replace("bi-sun", "bi-moon");
+                }
+            });
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
-</html> 
+</html>

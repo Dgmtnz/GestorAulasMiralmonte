@@ -15,7 +15,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.joange.model.Usuario;
 import com.joange.model.UsuarioCurso;
-import com.joange.model.Curso;
 import com.joange.model.TipoUsuario;
 import com.joange.service.UsuarioService;
 import com.joange.service.TipoUsuarioService;

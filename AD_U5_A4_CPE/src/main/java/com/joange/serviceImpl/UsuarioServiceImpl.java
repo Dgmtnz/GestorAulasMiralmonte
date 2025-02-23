@@ -17,6 +17,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import com.joange.model.TipoUsuario;
+import com.joange.model.Curso;
 // ... otros imports según las anotaciones que uses
 
 @Service
@@ -109,5 +110,17 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
         
         return "ADMIN".equalsIgnoreCase(usuarioRecargado.getTipoUsuario().getNombre());
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Usuario findByIdWithCursos(Long id) {
+        return usuarioRepository.findByIdWithCursos(id);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Curso> findCursosByUsuarioId(Long usuarioId) {
+        return usuarioRepository.findCursosByUsuarioId(usuarioId);
     }
 } 

@@ -61,8 +61,42 @@
             margin-left: 10px;
         }
 
+
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         .dark-mode .card {
             background-color: var(--card-dark);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .form-control {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-control:focus {
+            background-color: var(--card-dark);
+            border-color: var(--primary-color);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-label {
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-check {
             color: var(--text-dark);
         }
 
@@ -112,6 +146,27 @@
                     <input type="hidden" th:field="*{idaula}" />
 
                     <div class="mb-3">
+                        <label for="edificio" class="form-label">Edificio</label>
+                        <select class="form-control" id="edificio" name="edificio" required>
+                            <option value="">Seleccione un edificio</option>
+                            <option th:each="edificio : ${edificios}" th:value="${edificio.idedificio}"
+                                th:text="${edificio.nombre}"
+                                th:selected="${aula.planta != null && aula.planta.edificio != null && aula.planta.edificio.idedificio == edificio.idedificio}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="planta" class="form-label">Planta</label>
+                        <select class="form-control" id="planta" name="planta.idplanta" required>
+                            <option value="">Seleccione una planta</option>
+                            <option th:if="${aula.planta != null}" th:value="${aula.planta.idplanta}"
+                                th:text="${aula.planta.nombre}" selected>
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre del Aula</label>
                         <input type="text" class="form-control" id="nombre" th:field="*{nombre}" required>
                     </div>
@@ -119,15 +174,6 @@
                     <div class="mb-3">
                         <label for="descripcion" class="form-label">Descripción</label>
                         <input type="text" class="form-control" id="descripcion" th:field="*{descripcion}" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="planta" class="form-label">Planta</label>
-                        <select class="form-control" id="planta" th:field="*{planta.idplanta}" required>
-                            <option value="">Seleccione una planta</option>
-                            <option th:each="planta : ${plantas}" th:value="${planta.idplanta}"
-                                th:text="${planta.nombre}"></option>
-                        </select>
                     </div>
 
                     <div class="mb-3">
@@ -242,6 +288,74 @@
                 }
                 reader.readAsDataURL(file);
             }
+        });
+
+        // Función para cargar las plantas
+        function cargarPlantas(edificioId, plantaActualId) {
+            const plantaSelect = document.getElementById('planta');
+
+            if (edificioId) {
+                // Habilitar el selector de plantas
+                plantaSelect.disabled = false;
+
+                // Hacer la petición AJAX para obtener las plantas
+                fetch(`/plantas/edificio/${edificioId}`)
+                    .then(response => response.json())
+                    .then(plantas => {
+                        // Limpiar las opciones actuales
+                        plantaSelect.innerHTML = '<option value="">Seleccione una planta</option>';
+
+                        // Añadir las nuevas opciones
+                        plantas.forEach(planta => {
+                            const option = document.createElement('option');
+                            option.value = planta.idplanta;
+                            option.textContent = planta.nombre;
+                            if (plantaActualId && planta.idplanta == plantaActualId) {
+                                option.selected = true;
+                            }
+                            plantaSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        plantaSelect.innerHTML = '<option value="">Error al cargar las plantas</option>';
+                    });
+            } else {
+                // Si no hay edificio seleccionado, deshabilitar y limpiar el selector de plantas
+                plantaSelect.disabled = true;
+                plantaSelect.innerHTML = '<option value="">Primero seleccione un edificio</option>';
+            }
+        }
+
+        // Cargar las plantas del edificio actual al cargar la página
+        document.addEventListener("DOMContentLoaded", function () {
+            const darkModeToggle = document.getElementById("darkModeToggle");
+            const body = document.body;
+            const icon = darkModeToggle.querySelector("i");
+
+            // Recuperar el estado del modo oscuro
+            const isDarkMode = localStorage.getItem("darkMode") === "true";
+            if (isDarkMode) {
+                body.classList.add("dark-mode");
+                icon.classList.replace("bi-moon", "bi-sun");
+            }
+
+            darkModeToggle.addEventListener("click", function () {
+                body.classList.toggle("dark-mode");
+                const isDark = body.classList.contains("dark-mode");
+                localStorage.setItem("darkMode", isDark);
+
+                if (isDark) {
+                    icon.classList.replace("bi-moon", "bi-sun");
+                } else {
+                    icon.classList.replace("bi-sun", "bi-moon");
+                }
+            });
+        });
+
+        // Evento para cuando cambia el edificio
+        document.getElementById('edificio').addEventListener('change', function () {
+            cargarPlantas(this.value);
         });
     </script>
 </body>

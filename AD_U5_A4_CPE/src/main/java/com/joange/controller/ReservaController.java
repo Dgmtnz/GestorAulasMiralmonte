@@ -19,6 +19,8 @@ import com.joange.service.ReservaService;
 import com.joange.service.AulaService;
 import com.joange.service.UsuarioService;
 import com.joange.service.CursoService;
+import com.joange.service.EdificioService;
+import com.joange.service.TipoAulaService;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
@@ -47,33 +49,41 @@ public class ReservaController {
     @Autowired
     private CursoService cursoService;
     
+    @Autowired
+    private EdificioService edificioService;
+    
+    @Autowired
+    private TipoAulaService tipoAulaService;
+    
     @GetMapping("/listar-aulas")
     public String listarAulasParaReserva(Model model) {
-        List<Aula> aulas = aulaService.findAll();
-        Map<Long, List<Reserva>> reservasPorAula = new HashMap<>();
-        
-        for (Aula aula : aulas) {
-            reservasPorAula.put(aula.getIdaula(), 
-                reservaService.findByAula(aula.getIdaula()));
-        }
-        
-        model.addAttribute("aulas", aulas);
-        model.addAttribute("reservasPorAula", reservasPorAula);
+        model.addAttribute("aulas", aulaService.findAll());
+        model.addAttribute("edificios", edificioService.findActivos());
+        model.addAttribute("tiposAula", tipoAulaService.findAll());
         return "reservas/listar-aulas";
     }
     
     @GetMapping("/crear/{idAula}")
-    public String mostrarFormularioCreacion(@PathVariable Long idAula, Model model) {
+    public String mostrarFormularioCreacion(@PathVariable Long idAula, Model model, HttpSession session) {
+        Usuario usuarioActual = (Usuario) session.getAttribute("usuarioActual");
+        if (usuarioActual == null) {
+            return "redirect:/login";
+        }
+
         Aula aula = aulaService.findByIdaula(idAula);
         if (aula == null) {
             return "redirect:/reservas/listar-aulas";
         }
         
+        List<Curso> cursos = usuarioService.findCursosByUsuarioId(usuarioActual.getIdusuario());
+        
         Reserva nuevaReserva = new Reserva();
         nuevaReserva.setAula(aula);
+        nuevaReserva.setUsuario(usuarioActual);
         
         model.addAttribute("aula", aula);
         model.addAttribute("nuevaReserva", nuevaReserva);
+        model.addAttribute("cursos", cursos);
         return "reservas/crear";
     }
     
@@ -90,56 +100,31 @@ public class ReservaController {
     }
     
     @PostMapping("/guardar")
-    public String guardarReserva(@ModelAttribute Reserva reserva, 
+    @Transactional
+    public String guardarReserva(@ModelAttribute Reserva nuevaReserva, 
                                @RequestParam(required = false) Long cursoId,
-                               RedirectAttributes redirectAttributes, 
-                               HttpSession session) {
+                               @RequestParam String tiporeserva,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
         try {
             Usuario usuarioActual = (Usuario) session.getAttribute("usuarioActual");
             if (usuarioActual == null) {
                 return "redirect:/login";
             }
 
-            // Configuración básica de la reserva
-            reserva.setUsuario(usuarioActual);
-            reserva.setValidar(false);
-            reserva.setActivo(true);
+            nuevaReserva.setUsuario(usuarioActual);
             
-            // Si se seleccionó un curso, asociarlo a la reserva
-            if (cursoId != null) {
-                Optional<Curso> curso = cursoService.findById(cursoId);
-                if (curso.isPresent()) {
-                    reserva.setCurso(curso.get());
-                }
+            // Si es una reserva de curso, establecer el curso
+            if ("curso".equals(tiporeserva) && cursoId != null) {
+                Curso curso = cursoService.findById(cursoId)
+                    .orElseThrow(() -> new RuntimeException("Curso no encontrado"));
+                nuevaReserva.setCurso(curso);
             }
-
-            // Validaciones de disponibilidad y horarios
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(reserva.getHoradesde());
-            int horaInicio = calendar.get(Calendar.HOUR_OF_DAY);
             
-            calendar.setTime(reserva.getHorahasta());
-            int horaFin = calendar.get(Calendar.HOUR_OF_DAY);
-
-            if (!reservaService.isAulaDisponible(
-                    reserva.getAula().getIdaula(),
-                    reserva.getFechadesde(),
-                    horaInicio,
-                    horaFin)) {
-                redirectAttributes.addFlashAttribute("error", "El aula no está disponible en ese horario");
-                return "redirect:/reservas/crear/" + reserva.getAula().getIdaula();
-            }
-
-            reserva.setFechahasta(reserva.getFechadesde());
-            reservaService.save(reserva);
-            
-            String mensaje = reserva.getCurso() != null ? 
-                "Reserva creada exitosamente para el curso " + reserva.getCurso().getNombre() :
-                "Reserva personal creada exitosamente";
-            
-            redirectAttributes.addFlashAttribute("mensajeExito", mensaje);
+            reservaService.save(nuevaReserva);
+            redirectAttributes.addFlashAttribute("mensaje", "Reserva creada con éxito");
             return "redirect:/home";
-
+            
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al crear la reserva: " + e.getMessage());
             return "redirect:/reservas/listar-aulas";
@@ -162,11 +147,17 @@ public class ReservaController {
             }
     
             Reserva reserva = reservaOpt.get();
-            
-            // Usar el servicio para verificar si es admin
             boolean esAdmin = usuarioService.esAdministrador(usuarioActual);
             
-            if (!esAdmin && !reserva.getUsuario().getIdusuario().equals(usuarioActual.getIdusuario())) {
+            // Si es admin, puede eliminar cualquier reserva
+            if (esAdmin) {
+                reservaService.deleteById(id);
+                redirectAttributes.addFlashAttribute("mensajeExito", "Reserva eliminada correctamente");
+                return "redirect:/home";
+            }
+            
+            // Si no es admin, solo puede eliminar sus propias reservas
+            if (!reserva.getUsuario().getIdusuario().equals(usuarioActual.getIdusuario())) {
                 redirectAttributes.addFlashAttribute("error", "No tienes permiso para eliminar esta reserva");
                 return "redirect:/home";
             }
@@ -218,49 +209,47 @@ public class ReservaController {
     }
 
     @GetMapping("/calendario")
-    public String mostrarCalendario(Model model, HttpSession session) {
-        Usuario usuarioActual = (Usuario) session.getAttribute("usuarioActual");
-        if (usuarioActual == null) {
-            return "redirect:/login";
-        }
-        
-        List<Reserva> todasReservas = reservaService.findAll();
-        List<Map<String, Object>> eventos = new ArrayList<>();
-        
-        for (Reserva reserva : todasReservas) {
-            Map<String, Object> evento = new HashMap<>();
-            evento.put("title", reserva.getAula().getNombre() + " - " + reserva.getUsuario().getNombre());
-            
-            // Combinar fecha y hora para el inicio
-            Calendar calStart = Calendar.getInstance();
-            calStart.setTime(reserva.getFechadesde());
-            Calendar timeStart = Calendar.getInstance();
-            timeStart.setTime(reserva.getHoradesde());
-            calStart.set(Calendar.HOUR_OF_DAY, timeStart.get(Calendar.HOUR_OF_DAY));
-            calStart.set(Calendar.MINUTE, timeStart.get(Calendar.MINUTE));
-            evento.put("start", calStart.getTime());
-            
-            // Combinar fecha y hora para el fin
-            Calendar calEnd = Calendar.getInstance();
-            calEnd.setTime(reserva.getFechahasta());
-            Calendar timeEnd = Calendar.getInstance();
-            timeEnd.setTime(reserva.getHorahasta());
-            calEnd.set(Calendar.HOUR_OF_DAY, timeEnd.get(Calendar.HOUR_OF_DAY));
-            calEnd.set(Calendar.MINUTE, timeEnd.get(Calendar.MINUTE));
-            evento.put("end", calEnd.getTime());
-            
-            // Color según si es reserva propia o no
-            if (reserva.getUsuario().getIdusuario().equals(usuarioActual.getIdusuario())) {
-                evento.put("color", "#800020"); // Color primario para reservas propias
-            } else {
-                evento.put("color", "#6c757d"); // Gris para otras reservas
+    public String mostrarCalendarioGeneral(Model model, HttpSession session) {
+        try {
+            Usuario usuarioActual = (Usuario) session.getAttribute("usuarioActual");
+            if (usuarioActual == null) {
+                return "redirect:/login";
+            }
+
+            List<Reserva> reservas = reservaService.findAll();
+            List<Map<String, Object>> eventosCalendario = new ArrayList<>();
+
+            for (Reserva reserva : reservas) {
+                if (reserva.getFechadesde() != null && reserva.getHoradesde() != null && reserva.getHorahasta() != null) {
+                    Map<String, Object> evento = new HashMap<>();
+                    evento.put("title", reserva.getAula().getNombre() + " - " + reserva.getUsuario().getNombre());
+                    
+                    Calendar calInicio = Calendar.getInstance();
+                    calInicio.setTime(reserva.getFechadesde());
+                    Calendar horaInicio = Calendar.getInstance();
+                    horaInicio.setTime(reserva.getHoradesde());
+                    calInicio.set(Calendar.HOUR_OF_DAY, horaInicio.get(Calendar.HOUR_OF_DAY));
+                    calInicio.set(Calendar.MINUTE, horaInicio.get(Calendar.MINUTE));
+                    evento.put("start", calInicio.getTime());
+                    
+                    Calendar calFin = Calendar.getInstance();
+                    calFin.setTime(reserva.getFechadesde());
+                    Calendar horaFin = Calendar.getInstance();
+                    horaFin.setTime(reserva.getHorahasta());
+                    calFin.set(Calendar.HOUR_OF_DAY, horaFin.get(Calendar.HOUR_OF_DAY));
+                    calFin.set(Calendar.MINUTE, horaFin.get(Calendar.MINUTE));
+                    evento.put("end", calFin.getTime());
+                    
+                    eventosCalendario.add(evento);
+                }
             }
             
-            eventos.add(evento);
+            model.addAttribute("eventos", eventosCalendario);
+            return "reservas/calendario";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/home";
         }
-        
-        model.addAttribute("eventos", eventos);
-        return "reservas/calendario";
     }
 
     @GetMapping("/editar/{id}")
@@ -317,6 +306,7 @@ public class ReservaController {
             Reserva reservaExistente = reservaExistenteOpt.get();
             boolean esAdmin = usuarioService.esAdministrador(usuarioActual);
             
+            // Si no es admin, verificar que sea el propietario de la reserva
             if (!esAdmin && !reservaExistente.getUsuario().getIdusuario().equals(usuarioActual.getIdusuario())) {
                 redirectAttributes.addFlashAttribute("error", "No tienes permiso para editar esta reserva");
                 return "redirect:/home";

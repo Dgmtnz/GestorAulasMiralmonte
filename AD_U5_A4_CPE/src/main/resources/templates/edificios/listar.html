@@ -88,12 +88,37 @@
         .dark-mode .table-hover tbody tr:hover td {
             background-color: rgba(255, 255, 255, 0.1);
         }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .modal-content {
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 
 <body>
     <!-- Header -->
-    <nav class="navbar navbar-dark" style="background-color: var(--primary-color);">
+    <nav class="navbar navbar-dark">
         <div class="container">
             <div class="d-flex align-items-center">
                 <a class="navbar-brand" href="/homeAdmin">
@@ -208,22 +233,29 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Modo oscuro
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const body = document.body;
+        document.addEventListener("DOMContentLoaded", function () {
+            const darkModeToggle = document.getElementById("darkModeToggle");
+            const body = document.body;
+            const icon = darkModeToggle.querySelector("i");
 
-        // Verificar preferencia guardada
-        const darkMode = localStorage.getItem('darkMode') === 'true';
-        if (darkMode) {
-            body.classList.add('dark-mode');
-            darkModeToggle.innerHTML = '<i class="bi bi-sun"></i>';
-        }
+            // Recuperar el estado del modo oscuro
+            const isDarkMode = localStorage.getItem("darkMode") === "true";
+            if (isDarkMode) {
+                body.classList.add("dark-mode");
+                icon.classList.replace("bi-moon", "bi-sun");
+            }
 
-        darkModeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            const isDarkMode = body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode);
-            darkModeToggle.innerHTML = isDarkMode ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon"></i>';
+            darkModeToggle.addEventListener("click", function () {
+                body.classList.toggle("dark-mode");
+                const isDark = body.classList.contains("dark-mode");
+                localStorage.setItem("darkMode", isDark);
+
+                if (isDark) {
+                    icon.classList.replace("bi-moon", "bi-sun");
+                } else {
+                    icon.classList.replace("bi-sun", "bi-moon");
+                }
+            });
         });
     </script>
 </body>

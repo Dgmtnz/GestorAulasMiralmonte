@@ -44,6 +44,12 @@
             margin-top: auto;
             padding: 20px 0;
             color: white;
+            background-color: var(--primary-color) !important;
+        }
+
+        .footer-logo {
+            height: 30px;
+            margin-left: 10px;
         }
 
         .breadcrumb-item a {
@@ -57,6 +63,48 @@
 
         .dark-mode .card {
             background-color: var(--card-dark);
+            color: var(--text-dark);
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .card-title,
+        .dark-mode .card-text,
+        .dark-mode .form-label {
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-control {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-control:focus {
+            background-color: var(--card-dark);
+            border-color: var(--primary-color);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-select {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-select:focus {
+            background-color: var(--card-dark);
+            border-color: var(--primary-color);
             color: var(--text-dark);
         }
     </style>

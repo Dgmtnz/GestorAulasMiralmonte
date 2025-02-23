@@ -119,7 +119,10 @@ public class UsuarioController {
             usuario.setFoto(usuarioActual.getFoto());
             usuario.setContrasenya(usuarioActual.getContrasenya());
             
-            // Actualizar cursos con fecha de asignación
+            // Limpiar los cursos existentes
+            usuarioActual.getUsuarioCursos().clear();
+            
+            // Actualizar cursos solo si se seleccionaron nuevos
             if (cursosIds != null && !cursosIds.isEmpty()) {
                 List<UsuarioCurso> usuarioCursos = new ArrayList<>();
                 for (Long cursoId : cursosIds) {
@@ -135,6 +138,7 @@ public class UsuarioController {
                 }
                 usuario.setUsuarioCursos(usuarioCursos);
             } else {
+                // Si no se seleccionaron cursos, establecer una lista vacía
                 usuario.setUsuarioCursos(new ArrayList<>());
             }
 
@@ -143,8 +147,9 @@ public class UsuarioController {
             }
 
             usuarioService.save(usuario);
-            redirectAttributes.addFlashAttribute("mensaje", "Usuario actualizado exitosamente");
+            redirectAttributes.addFlashAttribute("mensajeExito", "Usuario actualizado correctamente");
             return "redirect:/usuarios/gestionar";
+
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al actualizar el usuario: " + e.getMessage());
             return "redirect:/usuarios/gestionar";

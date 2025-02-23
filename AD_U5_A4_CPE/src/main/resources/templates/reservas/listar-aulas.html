@@ -79,6 +79,72 @@
             margin-left: 10px;
             opacity: 0.9;
         }
+
+        .filter-section {
+            background-color: var(--card-light);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .filter-section {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .filter-section .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .filter-section .form-range::-webkit-slider-thumb {
+            background: var(--primary-color);
+        }
+
+        .filter-section .form-range::-moz-range-thumb {
+            background: var(--primary-color);
+        }
+
+        .filter-section .form-range::-ms-thumb {
+            background: var(--primary-color);
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .form-control {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-control:focus {
+            background-color: var(--card-dark);
+            border-color: var(--primary-color);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-select {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-select:focus {
+            background-color: var(--card-dark);
+            border-color: var(--primary-color);
+            color: var(--text-dark);
+        }
     </style>
 </head>
 
@@ -108,9 +174,83 @@
 
     <div class="container mt-5">
         <h2 class="mb-4">Seleccionar Aula para Reserva</h2>
-        <div class="row row-cols-1 g-4">
+
+        <!-- Sección de Filtros -->
+        <div class="filter-section mb-4">
+            <h4 class="mb-3">Filtros de Búsqueda</h4>
+            <div class="row">
+                <!-- Filtro por Edificio -->
+                <div class="col-md-4 mb-3">
+                    <label for="edificioFilter" class="form-label">Edificio</label>
+                    <select class="form-select" id="edificioFilter">
+                        <option value="">Todos los edificios</option>
+                        <option th:each="edificio : ${edificios}" th:value="${edificio.idedificio}"
+                            th:text="${edificio.nombre}"></option>
+                    </select>
+                </div>
+
+                <!-- Filtro por Planta -->
+                <div class="col-md-4 mb-3">
+                    <label for="plantaFilter" class="form-label">Planta</label>
+                    <select class="form-select" id="plantaFilter">
+                        <option value="">Todas las plantas</option>
+                    </select>
+                </div>
+
+                <!-- Filtro por Tipo de Aula -->
+                <div class="col-md-4 mb-3">
+                    <label for="tipoAulaFilter" class="form-label">Tipo de Aula</label>
+                    <select class="form-select" id="tipoAulaFilter">
+                        <option value="">Todos los tipos</option>
+                        <option th:each="tipo : ${tiposAula}" th:value="${tipo.idtipo}" th:text="${tipo.nombre}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Filtro por Capacidad -->
+                <div class="col-md-6 mb-3">
+                    <label for="capacidadFilter" class="form-label">Capacidad mínima: <span
+                            id="capacidadValue">0</span></label>
+                    <input type="range" class="form-range" id="capacidadFilter" min="0" max="100" value="0">
+                </div>
+
+                <!-- Filtros de Equipamiento -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Equipamiento</label>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="proyectorFilter">
+                            <label class="form-check-label" for="proyectorFilter">Proyector</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="acFilter">
+                            <label class="form-check-label" for="acFilter">Aire Acondicionado</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="smartTvFilter">
+                            <label class="form-check-label" for="smartTvFilter">Smart TV</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="hdmiFilter">
+                            <label class="form-check-label" for="hdmiFilter">HDMI</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="appleTvFilter">
+                            <label class="form-check-label" for="appleTvFilter">Apple TV</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Aulas -->
+        <div class="row row-cols-1 g-4" id="aulasList">
             <div th:each="aula : ${aulas}" class="col">
-                <div class="card h-100">
+                <div class="card h-100" th:data-edificio-id="${aula.planta.edificio.idedificio}"
+                    th:data-planta-id="${aula.planta.idplanta}" th:data-tipo-id="${aula.tipoAula.idtipo}"
+                    th:data-capacidad="${aula.capacidad}" th:data-proyector="${aula.tieneProyector}"
+                    th:data-ac="${aula.tieneAC}" th:data-smarttv="${aula.tieneSmartTV}" th:data-hdmi="${aula.tieneHDMI}"
+                    th:data-appletv="${aula.tieneAppleTV}">
                     <div class="row g-0">
                         <div class="col-md-3">
                             <div class="card-img-container" style="height: 250px; overflow: hidden;">
@@ -165,6 +305,11 @@
                                                     th:class="${aula.tieneHDMI} ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
                                                 HDMI
                                             </li>
+                                            <li class="list-group-item">
+                                                <i
+                                                    th:class="${aula.tieneAppleTV} ? 'bi bi-check-circle-fill text-success' : 'bi bi-x-circle-fill text-danger'"></i>
+                                                Apple TV
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>
@@ -210,11 +355,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // Dark mode functionality
             const darkModeToggle = document.getElementById("darkModeToggle");
             const body = document.body;
             const icon = darkModeToggle.querySelector("i");
 
-            // Recuperar el estado del modo oscuro
             const isDarkMode = localStorage.getItem("darkMode") === "true";
             if (isDarkMode) {
                 body.classList.add("dark-mode");
@@ -232,6 +377,142 @@
                     icon.classList.replace("bi-sun", "bi-moon");
                 }
             });
+
+            // Filtros functionality
+            const edificioFilter = document.getElementById('edificioFilter');
+            const plantaFilter = document.getElementById('plantaFilter');
+            const tipoAulaFilter = document.getElementById('tipoAulaFilter');
+            const capacidadFilter = document.getElementById('capacidadFilter');
+            const capacidadValue = document.getElementById('capacidadValue');
+            const proyectorFilter = document.getElementById('proyectorFilter');
+            const acFilter = document.getElementById('acFilter');
+            const smartTvFilter = document.getElementById('smartTvFilter');
+            const hdmiFilter = document.getElementById('hdmiFilter');
+            const appleTvFilter = document.getElementById('appleTvFilter');
+
+            // Update capacidad value display
+            capacidadFilter.addEventListener('input', function () {
+                capacidadValue.textContent = this.value;
+                aplicarFiltros();
+            });
+
+            // Cargar plantas cuando se selecciona un edificio
+            edificioFilter.addEventListener('change', function () {
+                const edificioId = this.value;
+                if (edificioId) {
+                    fetch(`/plantas/edificio/${edificioId}`)
+                        .then(response => response.json())
+                        .then(plantas => {
+                            plantaFilter.innerHTML = '<option value="">Todas las plantas</option>';
+                            plantas.forEach(planta => {
+                                plantaFilter.innerHTML += `<option value="${planta.idplanta}">${planta.nombre}</option>`;
+                            });
+                        });
+                } else {
+                    plantaFilter.innerHTML = '<option value="">Todas las plantas</option>';
+                }
+                aplicarFiltros();
+            });
+
+            // Aplicar filtros en cada cambio
+            [plantaFilter, tipoAulaFilter].forEach(filter => {
+                filter.addEventListener('change', aplicarFiltros);
+            });
+
+            [proyectorFilter, acFilter, smartTvFilter, hdmiFilter, appleTvFilter].forEach(filter => {
+                filter.addEventListener('change', aplicarFiltros);
+            });
+
+            function aplicarFiltros() {
+                const aulas = document.querySelectorAll('#aulasList .col');
+
+                aulas.forEach(aula => {
+                    let mostrar = true;
+                    const aulaCard = aula.querySelector('.card');
+
+                    // Filtro por edificio
+                    if (edificioFilter.value) {
+                        const edificioId = aulaCard.getAttribute('data-edificio-id');
+                        if (edificioId !== edificioFilter.value) {
+                            mostrar = false;
+                        }
+                    }
+
+                    // Filtro por planta
+                    if (plantaFilter.value) {
+                        const plantaId = aulaCard.getAttribute('data-planta-id');
+                        if (plantaId !== plantaFilter.value) {
+                            mostrar = false;
+                        }
+                    }
+
+                    // Filtro por tipo de aula
+                    if (tipoAulaFilter.value) {
+                        const tipoId = aulaCard.getAttribute('data-tipo-id');
+                        if (tipoId !== tipoAulaFilter.value) {
+                            mostrar = false;
+                        }
+                    }
+
+                    // Filtro por capacidad (mostrar aulas con capacidad igual o mayor al valor seleccionado)
+                    const capacidad = parseInt(aulaCard.getAttribute('data-capacidad'));
+                    if (capacidad < parseInt(capacidadFilter.value)) {
+                        mostrar = false;
+                    }
+
+                    // Filtros de equipamiento
+                    if (proyectorFilter.checked && aulaCard.getAttribute('data-proyector') !== 'true') mostrar = false;
+                    if (acFilter.checked && aulaCard.getAttribute('data-ac') !== 'true') mostrar = false;
+                    if (smartTvFilter.checked && aulaCard.getAttribute('data-smarttv') !== 'true') mostrar = false;
+                    if (hdmiFilter.checked && aulaCard.getAttribute('data-hdmi') !== 'true') mostrar = false;
+                    if (appleTvFilter.checked && aulaCard.getAttribute('data-appletv') !== 'true') mostrar = false;
+
+                    // Aplicar visibilidad
+                    aula.style.display = mostrar ? '' : 'none';
+                });
+
+                // Función para verificar si realmente no hay resultados
+                const verificarResultados = () => {
+                    const aulasVisibles = Array.from(document.querySelectorAll('#aulasList .col')).filter(aula =>
+                        aula.style.display !== 'none'
+                    ).length;
+
+                    // Primera verificación
+                    if (aulasVisibles > 0) {
+                        // Si hay aulas visibles, eliminar el mensaje si existe
+                        const mensajeExistente = document.getElementById('mensajeNoResultados');
+                        if (mensajeExistente) {
+                            mensajeExistente.remove();
+                        }
+                        return;
+                    }
+
+                    // Segunda verificación después de un pequeño retraso
+                    setTimeout(() => {
+                        const segundaVerificacion = Array.from(document.querySelectorAll('#aulasList .col')).filter(aula =>
+                            aula.style.display !== 'none'
+                        ).length;
+
+                        // Eliminar mensaje existente si hay
+                        const mensajeExistente = document.getElementById('mensajeNoResultados');
+                        if (mensajeExistente) {
+                            mensajeExistente.remove();
+                        }
+
+                        // Solo crear y mostrar el mensaje si ambas verificaciones confirman que no hay resultados
+                        if (segundaVerificacion === 0) {
+                            const mensajeNoResultados = document.createElement('div');
+                            mensajeNoResultados.id = 'mensajeNoResultados';
+                            mensajeNoResultados.className = 'alert alert-info mt-3';
+                            mensajeNoResultados.textContent = 'No se encontraron aulas que coincidan con los filtros seleccionados.';
+                            document.querySelector('#aulasList').before(mensajeNoResultados);
+                        }
+                    }, 150); // Aumentamos ligeramente el retraso para mayor seguridad
+                };
+
+                // Ejecutar la verificación con un pequeño retraso inicial
+                setTimeout(verificarResultados, 100); // Aumentamos también el retraso inicial
+            }
         });
     </script>
 </body>

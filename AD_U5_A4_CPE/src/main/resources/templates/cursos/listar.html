@@ -31,16 +31,11 @@
             color: var(--text-dark);
         }
 
-        body.dark-mode .card {
-            background-color: var(--card-dark);
-        }
-
-        .navbar,
-        .footer {
+        .navbar {
             background-color: var(--primary-color) !important;
         }
 
-        .navbar-logo {
+        .logo {
             height: 40px;
             margin-right: 10px;
         }
@@ -51,17 +46,120 @@
             color: white;
         }
 
-        .logo {
-            height: 40px;
-            width: auto;
-            margin-right: 10px;
+        .footer a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer a:hover {
+            color: var(--warning-color);
         }
 
         .footer-logo {
             height: 30px;
-            width: auto;
             margin-left: 10px;
-            opacity: 0.9;
+        }
+
+        .dark-mode .card {
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .table {
+            color: var(--text-dark);
+        }
+
+        .dark-mode .table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .table tbody tr,
+        .dark-mode .table tbody td {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .dark-mode .table-hover tbody tr:hover td {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .card-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .dark-mode .modal-content {
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .breadcrumb-item a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .dark-mode .breadcrumb-item.active {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .dark-mode .alert {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .alert-success {
+            background-color: rgba(25, 135, 84, 0.2);
+            border-color: rgba(25, 135, 84, 0.3);
+            color: #75b798;
+        }
+
+        .dark-mode .alert-danger {
+            background-color: rgba(220, 53, 69, 0.2);
+            border-color: rgba(220, 53, 69, 0.3);
+            color: #ea868f;
+        }
+
+        .dark-mode .badge {
+            color: var(--text-dark);
+        }
+
+        .dark-mode .badge-success {
+            background-color: var(--success-color);
+        }
+
+        .dark-mode .badge-warning {
+            background-color: var(--warning-color);
+            color: #000;
+        }
+
+        .navbar,
+        .footer {
+            background-color: var(--primary-color) !important;
         }
     </style>
 </head>

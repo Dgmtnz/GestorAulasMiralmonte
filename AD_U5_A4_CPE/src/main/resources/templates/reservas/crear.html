@@ -30,9 +30,21 @@
             color: var(--text-dark);
         }
 
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         .dark-mode .card {
             background-color: var(--card-dark);
-            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
         }
 
         .dark-mode .card-title,
@@ -49,7 +61,39 @@
 
         .dark-mode .form-control:focus {
             background-color: var(--card-dark);
+            border-color: var(--primary-color);
             color: var(--text-dark);
+        }
+
+        .dark-mode .form-label {
+            color: var(--text-dark);
+        }
+
+        .dark-mode .alert {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .breadcrumb-item a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .dark-mode .breadcrumb-item.active {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .dark-mode .time-slider-container {
+            background: #2a2a2a;
+        }
+
+        .dark-mode .time-slot::after {
+            color: var(--text-dark);
+        }
+
+        .dark-mode .range-selector {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .navbar,
@@ -176,7 +220,7 @@
         }
 
         .range-handle {
-            width: 12px;
+            width: 2px;
             height: 100%;
             background: #fff;
             position: absolute;
@@ -197,18 +241,6 @@
 
         .time-slot.selected {
             background-color: var(--primary-color) !important;
-        }
-
-        .dark-mode .time-slider-container {
-            background: #2a2a2a;
-        }
-
-        .dark-mode .time-slot::after {
-            color: var(--text-dark);
-        }
-
-        .dark-mode .range-selector {
-            background: rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
@@ -315,6 +347,25 @@
                                 id="reservaForm">
                                 <input type="hidden" th:field="*{aula.idaula}">
 
+                                <div class="form-group mb-3">
+                                    <label for="tiporeserva">Tipo de Reserva:</label>
+                                    <select class="form-control" id="tiporeserva" name="tiporeserva"
+                                        onchange="toggleCursoSelect()">
+                                        <option value="personal">Personal</option>
+                                        <option value="curso">Para un Curso</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-3" id="cursoSelectDiv" style="display: none;">
+                                    <label for="cursoId">Seleccionar Curso:</label>
+                                    <select class="form-control" id="cursoId" name="cursoId">
+                                        <option value="">Seleccione un curso</option>
+                                        <th:block th:each="curso : ${cursos}">
+                                            <option th:value="${curso.idcurso}" th:text="${curso.nombre}"></option>
+                                        </th:block>
+                                    </select>
+                                </div>
+
                                 <div class="mb-3">
                                     <label for="fechadesde" class="form-label">Fecha</label>
                                     <input type="date" class="form-control" id="fechadesde" th:field="*{fechadesde}"
@@ -417,13 +468,13 @@
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const sliderContainer = document.querySelector('.time-slider-container');
             const timeSlots = document.querySelectorAll('.time-slot');
             const rangeSelector = document.querySelector('.range-selector');
             const leftHandle = document.querySelector('.range-handle-left');
             const rightHandle = document.querySelector('.range-handle-right');
-            
+
             let isDragging = false;
             let isResizingLeft = false;
             let isResizingRight = false;
@@ -431,40 +482,40 @@
             let startLeft;
             let startWidth;
             let animationFrameId;
-            
+
             // Función para ajustar a la hora más cercana
             function snapToHour(position) {
                 const timeSlotWidth = timeSlots[0].offsetWidth;
                 const slotIndex = Math.round(position / timeSlotWidth);
                 return slotIndex * timeSlotWidth;
             }
-            
+
             // Función para actualizar los campos de hora
             function updateTimeInputs(startHour, endHour) {
                 document.getElementById('horadesde').value = `${startHour.toString().padStart(2, '0')}:00`;
                 document.getElementById('horahasta').value = `${endHour.toString().padStart(2, '0')}:00`;
             }
-            
+
             // Función para obtener la hora basada en la posición
             function getHourFromPosition(position) {
                 const timeSlotWidth = timeSlots[0].offsetWidth;
                 const slotIndex = Math.floor(position / timeSlotWidth);
                 return parseInt(timeSlots[Math.min(Math.max(slotIndex, 0), timeSlots.length - 1)].getAttribute('data-time'));
             }
-            
+
             // Función para manejar el movimiento
             function handleMove(e) {
                 if (!isDragging && !isResizingLeft && !isResizingRight) return;
-                
+
                 if (animationFrameId) {
                     cancelAnimationFrame(animationFrameId);
                 }
-                
+
                 animationFrameId = requestAnimationFrame(() => {
                     const timeSlotWidth = timeSlots[0].offsetWidth;
                     const containerRect = sliderContainer.getBoundingClientRect();
                     const maxLeft = containerRect.width - rangeSelector.offsetWidth;
-                    
+
                     if (isDragging) {
                         let newLeft = startLeft + (e.clientX - startX);
                         newLeft = Math.max(0, Math.min(newLeft, maxLeft));
@@ -474,27 +525,27 @@
                         let newLeft = startLeft + (e.clientX - startX);
                         newLeft = Math.max(0, Math.min(newLeft, startLeft + startWidth - timeSlotWidth));
                         newLeft = snapToHour(newLeft);
-                        
+
                         const rightEdge = startLeft + startWidth;
                         const newWidth = rightEdge - newLeft;
-                        
+
                         rangeSelector.style.left = `${newLeft}px`;
                         rangeSelector.style.width = `${newWidth}px`;
                     } else if (isResizingRight) {
                         let newWidth = startWidth + (e.clientX - startX);
                         newWidth = Math.max(timeSlotWidth, Math.min(newWidth, containerRect.width - rangeSelector.offsetLeft));
-                        newWidth = snapToHour(newWidth + timeSlotWidth/2) - snapToHour(rangeSelector.offsetLeft);
+                        newWidth = snapToHour(newWidth + timeSlotWidth / 2) - snapToHour(rangeSelector.offsetLeft);
                         rangeSelector.style.width = `${newWidth}px`;
                     }
-                    
+
                     const startHour = getHourFromPosition(rangeSelector.offsetLeft);
                     const endHour = getHourFromPosition(rangeSelector.offsetLeft + rangeSelector.offsetWidth);
                     updateTimeInputs(startHour, endHour);
                 });
             }
-            
+
             // Eventos para arrastrar el selector
-            rangeSelector.addEventListener('mousedown', function(e) {
+            rangeSelector.addEventListener('mousedown', function (e) {
                 if (e.target === rangeSelector) {
                     isDragging = true;
                     startX = e.clientX;
@@ -502,62 +553,62 @@
                     rangeSelector.style.cursor = 'grabbing';
                 }
             });
-            
+
             // Eventos para redimensionar
-            leftHandle.addEventListener('mousedown', function(e) {
+            leftHandle.addEventListener('mousedown', function (e) {
                 isResizingLeft = true;
                 startX = e.clientX;
                 startLeft = rangeSelector.offsetLeft;
                 startWidth = rangeSelector.offsetWidth;
                 e.stopPropagation();
             });
-            
-            rightHandle.addEventListener('mousedown', function(e) {
+
+            rightHandle.addEventListener('mousedown', function (e) {
                 isResizingRight = true;
                 startX = e.clientX;
                 startWidth = rangeSelector.offsetWidth;
                 e.stopPropagation();
             });
-            
+
             document.addEventListener('mousemove', handleMove);
-            
-            document.addEventListener('mouseup', function() {
+
+            document.addEventListener('mouseup', function () {
                 if (isDragging || isResizingLeft || isResizingRight) {
                     if (animationFrameId) {
                         cancelAnimationFrame(animationFrameId);
                     }
-                    
+
                     const newLeft = snapToHour(rangeSelector.offsetLeft);
                     const newWidth = snapToHour(rangeSelector.offsetWidth);
                     rangeSelector.style.left = `${newLeft}px`;
                     rangeSelector.style.width = `${newWidth}px`;
-                    
+
                     const startHour = getHourFromPosition(newLeft);
                     const endHour = getHourFromPosition(newLeft + newWidth);
                     updateTimeInputs(startHour, endHour);
                 }
-                
+
                 isDragging = false;
                 isResizingLeft = false;
                 isResizingRight = false;
                 rangeSelector.style.cursor = 'grab';
             });
-            
+
             // Actualizar disponibilidad cuando se selecciona una fecha
-            document.getElementById('fechadesde').addEventListener('change', async function() {
+            document.getElementById('fechadesde').addEventListener('change', async function () {
                 const fecha = this.value;
                 const aulaId = document.querySelector('[name="aula.idaula"]').value;
-                
+
                 try {
                     const response = await fetch(`/reservas/api/reservas/disponibilidad/${aulaId}/${fecha}`);
                     const horasOcupadas = await response.json();
-                    
+
                     // Resetear todas las slots a disponibles
                     timeSlots.forEach(slot => {
                         slot.classList.remove('occupied');
                         slot.classList.add('available');
                     });
-                    
+
                     // Marcar las horas ocupadas
                     horasOcupadas.forEach(hora => {
                         const slot = document.querySelector(`.time-slot[data-time="${hora}"]`);
@@ -572,28 +623,28 @@
             });
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const fechaInput = document.getElementById('fechadesde');
             const aulaId = document.querySelector('input[name="aula.idaula"]').value;
             const horaDesdeInput = document.getElementById('horadesde');
             const horaHastaInput = document.getElementById('horahasta');
-            
+
             // Función para verificar disponibilidad
             async function verificarDisponibilidad() {
                 const fecha = fechaInput.value;
                 if (!fecha) return;
-                
+
                 try {
                     const response = await fetch(`/reservas/api/reservas/disponibilidad/${aulaId}/${fecha}`);
                     if (!response.ok) {
                         throw new Error('Error al obtener disponibilidad');
                     }
                     const horasOcupadas = await response.json();
-                    
+
                     // Obtener las horas seleccionadas
                     const horaInicio = parseInt(horaDesdeInput.value.split(':')[0]);
                     const horaFin = parseInt(horaHastaInput.value.split(':')[0]);
-                    
+
                     // Verificar si alguna hora seleccionada está ocupada
                     let horasConflicto = [];
                     for (let hora = horaInicio; hora < horaFin; hora++) {
@@ -601,7 +652,7 @@
                             horasConflicto.push(hora);
                         }
                     }
-                    
+
                     // Mostrar advertencia si hay conflicto
                     if (horasConflicto.length > 0) {
                         alert(`¡Advertencia! Las siguientes horas ya están reservadas: ${horasConflicto.join(', ')}:00`);
@@ -614,22 +665,22 @@
                     return false;
                 }
             }
-            
+
             // Agregar listeners para los cambios
             fechaInput.addEventListener('change', verificarDisponibilidad);
-            
+
             // Validar el formulario antes de enviar
-            document.getElementById('reservaForm').addEventListener('submit', async function(e) {
+            document.getElementById('reservaForm').addEventListener('submit', async function (e) {
                 e.preventDefault(); // Prevenir el envío del formulario por defecto
-                
+
                 const horaInicio = parseInt(horaDesdeInput.value.split(':')[0]);
                 const horaFin = parseInt(horaHastaInput.value.split(':')[0]);
-                
+
                 if (horaFin <= horaInicio) {
                     alert('La hora de fin debe ser posterior a la hora de inicio');
                     return;
                 }
-                
+
                 // Verificar disponibilidad antes de enviar
                 const disponible = await verificarDisponibilidad();
                 if (disponible) {
@@ -637,6 +688,12 @@
                 }
             });
         });
+
+        function toggleCursoSelect() {
+            var tiporeserva = document.getElementById('tiporeserva').value;
+            var cursoSelectDiv = document.getElementById('cursoSelectDiv');
+            cursoSelectDiv.style.display = tiporeserva === 'curso' ? 'block' : 'none';
+        }
     </script>
 </body>
 

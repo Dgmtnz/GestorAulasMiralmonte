@@ -74,6 +74,35 @@
             background-color: var(--card-dark);
             color: var(--text-dark);
         }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .card-title,
+        .dark-mode .card-text,
+        .dark-mode .form-label {
+            color: var(--text-dark);
+        }
+
+        .dark-mode dl.row dt,
+        .dark-mode dl.row dd {
+            color: var(--text-dark);
+        }
+
+        .dark-mode .list-group-item {
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 
@@ -206,9 +235,25 @@
         document.addEventListener("DOMContentLoaded", function () {
             const darkModeToggle = document.getElementById("darkModeToggle");
             const body = document.body;
+            const icon = darkModeToggle.querySelector("i");
+
+            // Recuperar el estado del modo oscuro
+            const isDarkMode = localStorage.getItem("darkMode") === "true";
+            if (isDarkMode) {
+                body.classList.add("dark-mode");
+                icon.classList.replace("bi-moon", "bi-sun");
+            }
 
             darkModeToggle.addEventListener("click", function () {
                 body.classList.toggle("dark-mode");
+                const isDark = body.classList.contains("dark-mode");
+                localStorage.setItem("darkMode", isDark);
+
+                if (isDark) {
+                    icon.classList.replace("bi-moon", "bi-sun");
+                } else {
+                    icon.classList.replace("bi-sun", "bi-moon");
+                }
             });
         });
     </script>

@@ -3,6 +3,8 @@ import java.util.List;
 import java.util.Optional;
 
 import com.joange.model.Usuario;
+import com.joange.model.Curso;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface UsuarioService {
     List<Usuario> findAll();
@@ -16,4 +18,8 @@ public interface UsuarioService {
     Usuario findByDni(String dni);
     boolean autenticar(String email, String contrasenya);
     boolean esAdministrador(Usuario usuario);
+    @Transactional(readOnly = true)
+    Usuario findByIdWithCursos(Long id);
+    @Transactional(readOnly = true)
+    List<Curso> findCursosByUsuarioId(Long usuarioId);
 } 

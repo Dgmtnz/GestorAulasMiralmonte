@@ -68,15 +68,6 @@
                     <input type="file" class="form-control" id="foto" name="fotoFile" accept="image/*">
                 </div>
 
-                <div class="mb-3">
-                    <label for="cursos" class="form-label">Cursos</label>
-                    <select multiple class="form-select" id="cursos" name="cursosIds">
-                        <option value="">Seleccione los cursos...</option>
-                        <option th:each="curso : ${cursos}" th:value="${curso.idcurso}" th:text="${curso.nombre}">
-                        </option>
-                    </select>
-                </div>
-
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input" id="esAdmin" name="esAdmin">
                     <label class="form-check-label" for="esAdmin">Registrarse como administrador</label>

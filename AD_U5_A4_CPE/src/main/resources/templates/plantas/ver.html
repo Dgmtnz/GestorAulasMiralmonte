@@ -66,22 +66,39 @@
             color: var(--text-dark);
         }
 
-        .dark-mode .card-header {
-            background-color: var(--card-dark);
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .dark-mode dl.row dt {
+        .dark-mode .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .card-title,
+        .dark-mode .card-text,
+        .dark-mode .form-label {
             color: var(--text-dark);
         }
 
-        .breadcrumb-item a {
-            color: white;
-            text-decoration: none;
+        .dark-mode dl.row dt,
+        .dark-mode dl.row dd {
+            color: var(--text-dark);
         }
 
-        .breadcrumb-item.active {
+        .dark-mode .breadcrumb-item.active {
             color: rgba(255, 255, 255, 0.7);
+        }
+
+        .dark-mode .breadcrumb-item a {
+            color: white;
+        }
+
+        .dark-mode .table {
+            color: var(--text-dark);
         }
     </style>
 </head>
@@ -96,9 +113,10 @@
                 </a>
                 <nav aria-label="breadcrumb" class="ms-3">
                     <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="/homeAdmin">Inicio</a></li>
-                        <li class="breadcrumb-item"><a href="/plantas/gestionar">Gestión Plantas</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Ver Planta</li>
+                        <li class="breadcrumb-item"><a href="/homeAdmin" class="text-white">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="/plantas/gestionar" class="text-white">Gestión Plantas</a>
+                        </li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">Ver Planta</li>
                     </ol>
                 </nav>
             </div>
@@ -194,9 +212,25 @@
         document.addEventListener("DOMContentLoaded", function () {
             const darkModeToggle = document.getElementById("darkModeToggle");
             const body = document.body;
+            const icon = darkModeToggle.querySelector("i");
+
+            // Recuperar el estado del modo oscuro
+            const isDarkMode = localStorage.getItem("darkMode") === "true";
+            if (isDarkMode) {
+                body.classList.add("dark-mode");
+                icon.classList.replace("bi-moon", "bi-sun");
+            }
 
             darkModeToggle.addEventListener("click", function () {
                 body.classList.toggle("dark-mode");
+                const isDark = body.classList.contains("dark-mode");
+                localStorage.setItem("darkMode", isDark);
+
+                if (isDark) {
+                    icon.classList.replace("bi-moon", "bi-sun");
+                } else {
+                    icon.classList.replace("bi-sun", "bi-moon");
+                }
             });
         });
     </script>

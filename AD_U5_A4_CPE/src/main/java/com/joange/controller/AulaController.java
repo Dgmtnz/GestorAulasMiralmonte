@@ -54,6 +54,7 @@ public class AulaController {
     @GetMapping("/crear")
     public String mostrarFormularioCreacion(Model model) {
         model.addAttribute("aula", new Aula());
+        model.addAttribute("edificios", edificioService.findActivos());
         model.addAttribute("plantas", plantaService.findActivos());
         model.addAttribute("tiposAula", tipoAulaService.findAll());
         return "aulas/crear";
@@ -97,6 +98,7 @@ public class AulaController {
             return "redirect:/aulas/gestionar";
         }
         model.addAttribute("aula", aula);
+        model.addAttribute("edificios", edificioService.findActivos());
         model.addAttribute("plantas", plantaService.findActivos());
         model.addAttribute("tiposAula", tipoAulaService.findAll());
         return "aulas/editar";

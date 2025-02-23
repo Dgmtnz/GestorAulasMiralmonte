@@ -124,15 +124,13 @@
         }
 
         .table-container {
-            background-color: white !important;
             border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 0px;
             margin: 20px 0;
         }
 
         .dark-mode .table-container {
-            background-color: white !important;
+            background-color: var(--bg-dark) !important;
         }
 
         .admin-options {
@@ -145,8 +143,20 @@
         .admin-button {
             padding: 15px;
             text-align: left;
-            border: 2px solid var(--warning-color);
-            color: var(--warning-color);
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .dark-mode .admin-button {
+            padding: 15px;
+            text-align: left;
+            border: 2px solid var(--primary-color);
+            color: white;
             background: transparent;
             border-radius: 8px;
             transition: all 0.3s ease;
@@ -155,7 +165,7 @@
         }
 
         .admin-button:hover {
-            background-color: var(--warning-color);
+            background-color: var(--primary-color);
             color: var(--text-light);
         }
 
@@ -239,6 +249,14 @@
             background-color: var(--card-dark);
         }
 
+        .table tbody {
+            color: black;
+        }
+
+        .dark-mode .table tbody {
+            color: white;
+        }
+
         .dark-mode .table thead th {
             background-color: var(--primary-color);
             color: white;
@@ -286,6 +304,24 @@
         .dark-mode .calendar-btn {
             background-color: var(--primary-color);
             color: white;
+        }
+
+        .table-container {
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos para tablas en ambos modos */
+        .table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .table tbody {
+            color: black;
         }
     </style>
 </head>
@@ -360,9 +396,9 @@
                                     class="btn btn-warning btn-sm me-1">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <form th:action="@{/reservas/eliminar/{id}(id=${reserva.idreserva})}" 
-                                      method="post" style="display: inline;"
-                                      onsubmit="return confirm('¿Estás seguro de eliminar esta reserva?')">
+                                <form th:action="@{/reservas/eliminar/{id}(id=${reserva.idreserva})}" method="post"
+                                    style="display: inline;"
+                                    onsubmit="return confirm('¿Estás seguro de eliminar esta reserva? Como administrador, puedes eliminar cualquier reserva.')">
                                     <button type="submit" class="btn btn-danger btn-sm">
                                         <i class="bi bi-trash"></i>
                                     </button>
@@ -389,7 +425,7 @@
                 </thead>
                 <tbody>
                     <!-- Mis Reservas -->
-                    <tr th:each="reserva : ${misReservas}">
+                    <tr th:each="reserva : ${reservasPersonales}">
                         <td th:text="${reserva.aula.nombre}"></td>
                         <td th:text="${#dates.format(reserva.fechadesde, 'dd/MM/yyyy')}"></td>
                         <td th:text="${#dates.format(reserva.horadesde, 'HH:mm')}"></td>
@@ -404,9 +440,49 @@
                                     class="btn btn-warning btn-sm me-1">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <form th:action="@{/reservas/eliminar/{id}(id=${reserva.idreserva})}" 
-                                      method="post" style="display: inline;"
-                                      onsubmit="return confirm('¿Estás seguro de eliminar esta reserva?')">
+                                <form th:action="@{/reservas/eliminar/{id}(id=${reserva.idreserva})}" method="post"
+                                    style="display: inline;"
+                                    onsubmit="return confirm('¿Estás seguro de eliminar esta reserva? Como administrador, puedes eliminar cualquier reserva.')">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4 class="section-title">Reservas de mis Cursos</h4>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Curso</th>
+                        <th>Aula</th>
+                        <th>Fecha</th>
+                        <th>Hora Inicio</th>
+                        <th>Hora Fin</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="reserva : ${reservasCursos}">
+                        <td th:text="${reserva.curso.nombre}"></td>
+                        <td th:text="${reserva.aula.nombre}"></td>
+                        <td th:text="${#dates.format(reserva.fechadesde, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${#dates.format(reserva.horadesde, 'HH:mm')}"></td>
+                        <td th:text="${#dates.format(reserva.horahasta, 'HH:mm')}"></td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a th:href="@{/reservas/editar/{id}(id=${reserva.idreserva})}"
+                                    class="btn btn-warning btn-sm me-1">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form th:action="@{/reservas/eliminar/{id}(id=${reserva.idreserva})}" method="post"
+                                    style="display: inline;"
+                                    onsubmit="return confirm('¿Estás seguro de eliminar esta reserva? Como administrador, puedes eliminar cualquier reserva.')">
                                     <button type="submit" class="btn btn-danger btn-sm">
                                         <i class="bi bi-trash"></i>
                                     </button>
@@ -430,11 +506,6 @@
 
         <h4 class="section-title">Opciones de Administración</h4>
         <div class="admin-options">
-            <!-- Gestión de Reservas -->
-            <a href="/reservas/gestionar" class="admin-button">
-                <i class="bi bi-calendar-check icon-large"></i>
-                Gestionar Reservas
-            </a>
 
             <!-- Edificios -->
 

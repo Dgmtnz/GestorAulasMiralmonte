@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import com.joange.model.Reserva;
 import com.joange.repository.ReservaRepository;
 import com.joange.service.ReservaService;
+import com.joange.model.Usuario;
+import com.joange.model.Curso;
 
 import java.util.List;
 import java.util.Optional;
@@ -85,5 +87,20 @@ public class ReservaServiceImpl implements ReservaService {
             }
         }
         return true;
+    }
+
+    @Override
+    public List<Reserva> findByUsuarioAndCursoIsNull(Usuario usuario) {
+        return reservaRepository.findByUsuarioAndCursoIsNull(usuario);
+    }
+
+    @Override
+    public List<Reserva> findByUsuarioAndCursoIsNotNull(Usuario usuario) {
+        return reservaRepository.findByUsuarioAndCursoIsNotNull(usuario);
+    }
+
+    @Override
+    public List<Reserva> findByCursoInAndCursoIsNotNull(List<Curso> cursos) {
+        return reservaRepository.findByCursoInAndCursoIsNotNull(cursos);
     }
 } 

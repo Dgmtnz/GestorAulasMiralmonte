@@ -32,7 +32,7 @@
 
         .dark-mode .card {
             background-color: var(--card-dark);
-            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
         }
 
         .dark-mode .card-title,
@@ -49,7 +49,33 @@
 
         .dark-mode .form-control:focus {
             background-color: var(--card-dark);
+            border-color: var(--primary-color);
             color: var(--text-dark);
+        }
+
+        .dark-mode .form-label {
+            color: var(--text-dark);
+        }
+
+        .dark-mode .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .alert {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .breadcrumb-item a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .dark-mode .breadcrumb-item.active {
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .navbar,
@@ -172,7 +198,7 @@
         }
 
         .range-handle {
-            width: 12px;
+            width: 2px;
             height: 100%;
             background: #fff;
             position: absolute;
@@ -205,6 +231,18 @@
 
         .dark-mode .range-selector {
             background: rgba(255, 255, 255, 0.3);
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
@@ -305,8 +343,8 @@
                             <h4 class="mb-0">Datos de la Reserva</h4>
                         </div>
                         <div class="card-body">
-                            <form th:action="@{/reservas/actualizar/{id}(id=${reserva.idreserva})}" method="post" th:object="${reserva}"
-                                id="reservaForm">
+                            <form th:action="@{/reservas/actualizar/{id}(id=${reserva.idreserva})}" method="post"
+                                th:object="${reserva}" id="reservaForm">
                                 <input type="hidden" th:field="*{aula.idaula}">
                                 <input type="hidden" th:field="*{idreserva}">
 
@@ -340,8 +378,10 @@
                                             <div class="range-handle range-handle-right"></div>
                                         </div>
                                     </div>
-                                    <input type="hidden" id="horadesde" name="horadesde" th:field="*{horadesde}" required>
-                                    <input type="hidden" id="horahasta" name="horahasta" th:field="*{horahasta}" required>
+                                    <input type="hidden" id="horadesde" name="horadesde" th:field="*{horadesde}"
+                                        required>
+                                    <input type="hidden" id="horahasta" name="horahasta" th:field="*{horahasta}"
+                                        required>
                                 </div>
 
                                 <div class="d-grid gap-2">
@@ -412,13 +452,13 @@
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const sliderContainer = document.querySelector('.time-slider-container');
             const timeSlots = document.querySelectorAll('.time-slot');
             const rangeSelector = document.querySelector('.range-selector');
             const leftHandle = document.querySelector('.range-handle-left');
             const rightHandle = document.querySelector('.range-handle-right');
-            
+
             let isDragging = false;
             let isResizingLeft = false;
             let isResizingRight = false;
@@ -426,40 +466,40 @@
             let startLeft;
             let startWidth;
             let animationFrameId;
-            
+
             // Función para ajustar a la hora más cercana
             function snapToHour(position) {
                 const timeSlotWidth = timeSlots[0].offsetWidth;
                 const slotIndex = Math.round(position / timeSlotWidth);
                 return slotIndex * timeSlotWidth;
             }
-            
+
             // Función para actualizar los campos de hora
             function updateTimeInputs(startHour, endHour) {
                 document.getElementById('horadesde').value = `${startHour.toString().padStart(2, '0')}:00`;
                 document.getElementById('horahasta').value = `${endHour.toString().padStart(2, '0')}:00`;
             }
-            
+
             // Función para obtener la hora basada en la posición
             function getHourFromPosition(position) {
                 const timeSlotWidth = timeSlots[0].offsetWidth;
                 const slotIndex = Math.floor(position / timeSlotWidth);
                 return parseInt(timeSlots[Math.min(Math.max(slotIndex, 0), timeSlots.length - 1)].getAttribute('data-time'));
             }
-            
+
             // Función para manejar el movimiento
             function handleMove(e) {
                 if (!isDragging && !isResizingLeft && !isResizingRight) return;
-                
+
                 if (animationFrameId) {
                     cancelAnimationFrame(animationFrameId);
                 }
-                
+
                 animationFrameId = requestAnimationFrame(() => {
                     const timeSlotWidth = timeSlots[0].offsetWidth;
                     const containerRect = sliderContainer.getBoundingClientRect();
                     const maxLeft = containerRect.width - rangeSelector.offsetWidth;
-                    
+
                     if (isDragging) {
                         let newLeft = startLeft + (e.clientX - startX);
                         newLeft = Math.max(0, Math.min(newLeft, maxLeft));
@@ -469,27 +509,27 @@
                         let newLeft = startLeft + (e.clientX - startX);
                         newLeft = Math.max(0, Math.min(newLeft, startLeft + startWidth - timeSlotWidth));
                         newLeft = snapToHour(newLeft);
-                        
+
                         const rightEdge = startLeft + startWidth;
                         const newWidth = rightEdge - newLeft;
-                        
+
                         rangeSelector.style.left = `${newLeft}px`;
                         rangeSelector.style.width = `${newWidth}px`;
                     } else if (isResizingRight) {
                         let newWidth = startWidth + (e.clientX - startX);
                         newWidth = Math.max(timeSlotWidth, Math.min(newWidth, containerRect.width - rangeSelector.offsetLeft));
-                        newWidth = snapToHour(newWidth + timeSlotWidth/2) - snapToHour(rangeSelector.offsetLeft);
+                        newWidth = snapToHour(newWidth + timeSlotWidth / 2) - snapToHour(rangeSelector.offsetLeft);
                         rangeSelector.style.width = `${newWidth}px`;
                     }
-                    
+
                     const startHour = getHourFromPosition(rangeSelector.offsetLeft);
                     const endHour = getHourFromPosition(rangeSelector.offsetLeft + rangeSelector.offsetWidth);
                     updateTimeInputs(startHour, endHour);
                 });
             }
-            
+
             // Eventos para arrastrar el selector
-            rangeSelector.addEventListener('mousedown', function(e) {
+            rangeSelector.addEventListener('mousedown', function (e) {
                 if (e.target === rangeSelector) {
                     isDragging = true;
                     startX = e.clientX;
@@ -497,63 +537,63 @@
                     rangeSelector.style.cursor = 'grabbing';
                 }
             });
-            
+
             // Eventos para redimensionar
-            leftHandle.addEventListener('mousedown', function(e) {
+            leftHandle.addEventListener('mousedown', function (e) {
                 isResizingLeft = true;
                 startX = e.clientX;
                 startLeft = rangeSelector.offsetLeft;
                 startWidth = rangeSelector.offsetWidth;
                 e.stopPropagation();
             });
-            
-            rightHandle.addEventListener('mousedown', function(e) {
+
+            rightHandle.addEventListener('mousedown', function (e) {
                 isResizingRight = true;
                 startX = e.clientX;
                 startWidth = rangeSelector.offsetWidth;
                 e.stopPropagation();
             });
-            
+
             document.addEventListener('mousemove', handleMove);
-            
-            document.addEventListener('mouseup', function() {
+
+            document.addEventListener('mouseup', function () {
                 if (isDragging || isResizingLeft || isResizingRight) {
                     if (animationFrameId) {
                         cancelAnimationFrame(animationFrameId);
                     }
-                    
+
                     const newLeft = snapToHour(rangeSelector.offsetLeft);
                     const newWidth = snapToHour(rangeSelector.offsetWidth);
                     rangeSelector.style.left = `${newLeft}px`;
                     rangeSelector.style.width = `${newWidth}px`;
-                    
+
                     const startHour = getHourFromPosition(newLeft);
                     const endHour = getHourFromPosition(newLeft + newWidth);
                     updateTimeInputs(startHour, endHour);
                 }
-                
+
                 isDragging = false;
                 isResizingLeft = false;
                 isResizingRight = false;
                 rangeSelector.style.cursor = 'grab';
             });
-            
+
             // Actualizar disponibilidad cuando se selecciona una fecha
-            document.getElementById('fechadesde').addEventListener('change', async function() {
+            document.getElementById('fechadesde').addEventListener('change', async function () {
                 const fecha = this.value;
                 const aulaId = document.querySelector('[name="aula.idaula"]').value;
                 const reservaId = document.querySelector('[name="idreserva"]').value;
-                
+
                 try {
                     const response = await fetch(`/reservas/api/reservas/disponibilidad/${aulaId}/${fecha}?excludeReservaId=${reservaId}`);
                     const horasOcupadas = await response.json();
-                    
+
                     // Resetear todas las slots a disponibles
                     timeSlots.forEach(slot => {
                         slot.classList.remove('occupied');
                         slot.classList.add('available');
                     });
-                    
+
                     // Marcar las horas ocupadas
                     horasOcupadas.forEach(hora => {
                         const slot = document.querySelector(`.time-slot[data-time="${hora}"]`);
@@ -572,20 +612,20 @@
             const horaHasta = document.getElementById('horahasta').value;
             const horaInicioNum = parseInt(horaDesde.split(':')[0]);
             const horaFinNum = parseInt(horaHasta.split(':')[0]);
-            
+
             const timeSlotWidth = timeSlots[0].offsetWidth;
             const startPosition = (horaInicioNum - 8) * timeSlotWidth; // 8 es la hora inicial
             const width = (horaFinNum - horaInicioNum) * timeSlotWidth;
-            
+
             rangeSelector.style.left = `${startPosition}px`;
             rangeSelector.style.width = `${width}px`;
         });
 
         // Cargar disponibilidad inicial
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             document.getElementById('fechadesde').dispatchEvent(new Event('change'));
         });
     </script>
 </body>
 
-</html> 
+</html>

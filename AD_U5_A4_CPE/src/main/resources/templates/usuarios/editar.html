@@ -67,6 +67,42 @@
             margin-left: 10px;
             opacity: 0.9;
         }
+
+        .dark-mode .form-control {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-control:focus {
+            background-color: var(--card-dark);
+            border-color: var(--primary-color);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-select {
+            background-color: var(--card-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-select:focus {
+            background-color: var(--card-dark);
+            border-color: var(--primary-color);
+            color: var(--text-dark);
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 
@@ -154,12 +190,22 @@
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="cursos" class="form-label">Cursos</label>
-                        <select class="form-select" id="cursos" name="cursosIds" multiple>
-                            <option th:each="curso : ${cursos}" th:value="${curso.idcurso}" th:text="${curso.nombre}">
-                            </option>
-                        </select>
+                    <div class="form-group mb-3">
+                        <label for="cursos">Cursos:</label>
+                        <div class="d-flex align-items-center mb-2">
+                            <select multiple class="form-control me-2" id="cursos" name="cursosIds">
+                                <option th:each="curso : ${cursos}" th:value="${curso.idcurso}"
+                                    th:text="${curso.nombre}"
+                                    th:selected="${usuario.usuarioCursos.?[curso.idcurso == __${curso.idcurso}__].size() > 0}">
+                                </option>
+                            </select>
+                            <button type="button" class="btn btn-outline-danger" onclick="deselectAllCourses()">
+                                <i class="bi bi-x-circle"></i> Quitar todos
+                            </button>
+                        </div>
+                        <small class="form-text text-muted">
+                            Mantén presionada la tecla Ctrl para seleccionar múltiples cursos o ninguno
+                        </small>
                     </div>
 
                     <div class="mb-3">
@@ -220,6 +266,10 @@
                 }
             });
         });
+
+        function deselectAllCourses() {
+            document.getElementById('cursos').selectedIndex = -1;
+        }
     </script>
 </body>
 
