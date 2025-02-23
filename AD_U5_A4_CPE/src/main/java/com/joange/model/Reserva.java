@@ -41,11 +41,11 @@ public class Reserva {
     private Boolean activo;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "AULAidaula")
+    @JoinColumn(name = "AULAidaula", nullable = false)
     private Aula aula;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USUARIOidusuario")
+    @JoinColumn(name = "USUARIOidusuario", nullable = false)
     private Usuario usuario;
     
     @ManyToOne(fetch = FetchType.LAZY)

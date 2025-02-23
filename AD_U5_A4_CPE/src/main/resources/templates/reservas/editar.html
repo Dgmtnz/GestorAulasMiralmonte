@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Crear Reserva - Gestor de Aulas</title>
+    <title>Editar Reserva - Gestor de Aulas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -59,7 +59,6 @@
 
         .logo {
             height: 40px;
-            width: auto;
             margin-right: 10px;
         }
 
@@ -81,9 +80,7 @@
 
         .footer-logo {
             height: 30px;
-            width: auto;
             margin-left: 10px;
-            opacity: 0.9;
         }
 
         .breadcrumb-item a {
@@ -109,7 +106,6 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         }
 
-        /* Estilos específicos para la imagen del aula */
         .aula-image {
             width: 100%;
             height: 300px;
@@ -214,7 +210,7 @@
 </head>
 
 <body>
-    <!-- Navbar como en plantas/crear.html -->
+    <!-- Navbar -->
     <nav class="navbar navbar-dark" style="background-color: var(--primary-color);">
         <div class="container">
             <div class="d-flex align-items-center">
@@ -225,9 +221,7 @@
                 <nav aria-label="breadcrumb" class="ms-3">
                     <ol class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="/homeAdmin" class="text-white">Inicio</a></li>
-                        <li class="breadcrumb-item"><a href="/reservas/listar-aulas" class="text-white">Seleccionar
-                                Aula</a></li>
-                        <li class="breadcrumb-item active text-white" aria-current="page">Crear Reserva</li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">Editar Reserva</li>
                     </ol>
                 </nav>
             </div>
@@ -241,7 +235,7 @@
 
     <div class="container">
         <div class="form-container">
-            <h2 class="text-center mb-4">Nueva Reserva</h2>
+            <h2 class="text-center mb-4">Editar Reserva</h2>
 
             <div class="row mb-4">
                 <!-- Información del Aula -->
@@ -304,16 +298,17 @@
                     </div>
                 </div>
 
-                <!-- Formulario de Reserva -->
+                <!-- Formulario de Edición -->
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-header">
                             <h4 class="mb-0">Datos de la Reserva</h4>
                         </div>
                         <div class="card-body">
-                            <form th:action="@{/reservas/guardar}" method="post" th:object="${nuevaReserva}"
+                            <form th:action="@{/reservas/actualizar/{id}(id=${reserva.idreserva})}" method="post" th:object="${reserva}"
                                 id="reservaForm">
                                 <input type="hidden" th:field="*{aula.idaula}">
+                                <input type="hidden" th:field="*{idreserva}">
 
                                 <div class="mb-3">
                                     <label for="fechadesde" class="form-label">Fecha</label>
@@ -345,15 +340,15 @@
                                             <div class="range-handle range-handle-right"></div>
                                         </div>
                                     </div>
-                                    <input type="hidden" id="horadesde" name="horadesde" required>
-                                    <input type="hidden" id="horahasta" name="horahasta" required>
+                                    <input type="hidden" id="horadesde" name="horadesde" th:field="*{horadesde}" required>
+                                    <input type="hidden" id="horahasta" name="horahasta" th:field="*{horahasta}" required>
                                 </div>
 
                                 <div class="d-grid gap-2">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="bi bi-calendar-check"></i> Confirmar Reserva
+                                        <i class="bi bi-save"></i> Guardar Cambios
                                     </button>
-                                    <a th:href="@{/reservas/listar-aulas}" class="btn btn-secondary">
+                                    <a th:href="@{/home}" class="btn btn-secondary">
                                         <i class="bi bi-x-circle"></i> Cancelar
                                     </a>
                                 </div>
@@ -365,7 +360,7 @@
         </div>
     </div>
 
-    <!-- Footer como en plantas/crear.html -->
+    <!-- Footer -->
     <footer class="footer mt-auto">
         <div class="container text-center">
             <span>© 2024 Gestor de Aulas - IES Miralmonte</span>
@@ -376,7 +371,7 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Script del modo oscuro como en plantas/crear.html
+        // Script del modo oscuro
         document.addEventListener("DOMContentLoaded", function () {
             const darkModeToggle = document.getElementById("darkModeToggle");
             const body = document.body;
@@ -547,9 +542,10 @@
             document.getElementById('fechadesde').addEventListener('change', async function() {
                 const fecha = this.value;
                 const aulaId = document.querySelector('[name="aula.idaula"]').value;
+                const reservaId = document.querySelector('[name="idreserva"]').value;
                 
                 try {
-                    const response = await fetch(`/reservas/api/reservas/disponibilidad/${aulaId}/${fecha}`);
+                    const response = await fetch(`/reservas/api/reservas/disponibilidad/${aulaId}/${fecha}?excludeReservaId=${reservaId}`);
                     const horasOcupadas = await response.json();
                     
                     // Resetear todas las slots a disponibles
@@ -570,74 +566,26 @@
                     console.error('Error al obtener disponibilidad:', error);
                 }
             });
+
+            // Inicializar el selector de rango con los valores actuales
+            const horaDesde = document.getElementById('horadesde').value;
+            const horaHasta = document.getElementById('horahasta').value;
+            const horaInicioNum = parseInt(horaDesde.split(':')[0]);
+            const horaFinNum = parseInt(horaHasta.split(':')[0]);
+            
+            const timeSlotWidth = timeSlots[0].offsetWidth;
+            const startPosition = (horaInicioNum - 8) * timeSlotWidth; // 8 es la hora inicial
+            const width = (horaFinNum - horaInicioNum) * timeSlotWidth;
+            
+            rangeSelector.style.left = `${startPosition}px`;
+            rangeSelector.style.width = `${width}px`;
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const fechaInput = document.getElementById('fechadesde');
-            const aulaId = document.querySelector('input[name="aula.idaula"]').value;
-            const horaDesdeInput = document.getElementById('horadesde');
-            const horaHastaInput = document.getElementById('horahasta');
-            
-            // Función para verificar disponibilidad
-            async function verificarDisponibilidad() {
-                const fecha = fechaInput.value;
-                if (!fecha) return;
-                
-                try {
-                    const response = await fetch(`/reservas/api/reservas/disponibilidad/${aulaId}/${fecha}`);
-                    if (!response.ok) {
-                        throw new Error('Error al obtener disponibilidad');
-                    }
-                    const horasOcupadas = await response.json();
-                    
-                    // Obtener las horas seleccionadas
-                    const horaInicio = parseInt(horaDesdeInput.value.split(':')[0]);
-                    const horaFin = parseInt(horaHastaInput.value.split(':')[0]);
-                    
-                    // Verificar si alguna hora seleccionada está ocupada
-                    let horasConflicto = [];
-                    for (let hora = horaInicio; hora < horaFin; hora++) {
-                        if (horasOcupadas.includes(hora)) {
-                            horasConflicto.push(hora);
-                        }
-                    }
-                    
-                    // Mostrar advertencia si hay conflicto
-                    if (horasConflicto.length > 0) {
-                        alert(`¡Advertencia! Las siguientes horas ya están reservadas: ${horasConflicto.join(', ')}:00`);
-                        return false;
-                    }
-                    return true;
-                } catch (error) {
-                    console.error('Error al verificar disponibilidad:', error);
-                    alert('Error al verificar la disponibilidad del aula');
-                    return false;
-                }
-            }
-            
-            // Agregar listeners para los cambios
-            fechaInput.addEventListener('change', verificarDisponibilidad);
-            
-            // Validar el formulario antes de enviar
-            document.getElementById('reservaForm').addEventListener('submit', async function(e) {
-                e.preventDefault(); // Prevenir el envío del formulario por defecto
-                
-                const horaInicio = parseInt(horaDesdeInput.value.split(':')[0]);
-                const horaFin = parseInt(horaHastaInput.value.split(':')[0]);
-                
-                if (horaFin <= horaInicio) {
-                    alert('La hora de fin debe ser posterior a la hora de inicio');
-                    return;
-                }
-                
-                // Verificar disponibilidad antes de enviar
-                const disponible = await verificarDisponibilidad();
-                if (disponible) {
-                    this.submit(); // Enviar el formulario si todo está bien
-                }
-            });
+        // Cargar disponibilidad inicial
+        window.addEventListener('load', function() {
+            document.getElementById('fechadesde').dispatchEvent(new Event('change'));
         });
     </script>
 </body>
 
-</html>
+</html> 

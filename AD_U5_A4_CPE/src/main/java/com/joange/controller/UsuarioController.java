@@ -77,7 +77,7 @@ public class UsuarioController {
     @GetMapping("/ver/{id}")
     public String verUsuario(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
-            Optional<Usuario> usuario = usuarioService.findByIdusuario(id);
+            Optional<Usuario> usuario = usuarioService.findById(id);
             if (!usuario.isPresent()) {
                 redirectAttributes.addFlashAttribute("error", "El usuario no existe");
                 return "redirect:/usuarios/gestionar";
@@ -92,7 +92,7 @@ public class UsuarioController {
 
     @GetMapping("/editar/{id}")
     public String editarUsuario(@PathVariable Long id, Model model) {
-        Optional<Usuario> usuario = usuarioService.findByIdusuario(id);
+        Optional<Usuario> usuario = usuarioService.findById(id);
         if (usuario.isPresent()) {
             model.addAttribute("usuario", usuario.get());
             model.addAttribute("cursos", cursoService.findAll());
@@ -108,7 +108,7 @@ public class UsuarioController {
                                   @RequestParam(required = false) List<Long> cursosIds,
                                   RedirectAttributes redirectAttributes) {
         try {
-            Optional<Usuario> usuarioExistente = usuarioService.findByIdusuario(id);
+            Optional<Usuario> usuarioExistente = usuarioService.findById(id);
             if (!usuarioExistente.isPresent()) {
                 redirectAttributes.addFlashAttribute("error", "Usuario no encontrado");
                 return "redirect:/usuarios/gestionar";
@@ -154,7 +154,7 @@ public class UsuarioController {
     @PostMapping("/eliminar/{id}")
     public String eliminarUsuario(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            Optional<Usuario> usuarioOpt = usuarioService.findByIdusuario(id);
+            Optional<Usuario> usuarioOpt = usuarioService.findById(id);
             if (!usuarioOpt.isPresent()) {
                 redirectAttributes.addFlashAttribute("error", "Usuario no encontrado");
                 return "redirect:/usuarios/gestionar";
@@ -169,7 +169,7 @@ public class UsuarioController {
                 return "redirect:/usuarios/gestionar";
             }
 
-            usuarioService.deleteByIdusuario(id);
+            usuarioService.deleteById(id);
             redirectAttributes.addFlashAttribute("mensaje", "Usuario eliminado exitosamente");
             return "redirect:/usuarios/gestionar";
         } catch (Exception e) {

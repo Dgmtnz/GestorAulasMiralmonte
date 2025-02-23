@@ -59,10 +59,20 @@ public class ReservaServiceImpl implements ReservaService {
     
     @Override
     public boolean isAulaDisponible(Long idaula, Date fecha, Integer horaInicio, Integer horaFin) {
+        return isAulaDisponible(idaula, fecha, horaInicio, horaFin, null);
+    }
+
+    @Override
+    public boolean isAulaDisponible(Long idaula, Date fecha, Integer horaInicio, Integer horaFin, Long idReservaExcluir) {
         List<Reserva> reservasExistentes = findByFechaAndAula(fecha, idaula);
         Calendar calendar = Calendar.getInstance();
         
         for (Reserva reserva : reservasExistentes) {
+            // Si es la reserva que estamos editando, la ignoramos
+            if (idReservaExcluir != null && reserva.getIdreserva().equals(idReservaExcluir)) {
+                continue;
+            }
+
             calendar.setTime(reserva.getHoradesde());
             int horaReservaInicio = calendar.get(Calendar.HOUR_OF_DAY);
             

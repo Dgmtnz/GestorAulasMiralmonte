@@ -1,14 +1,17 @@
 package com.joange.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.joange.model.Usuario;
 import com.joange.model.UsuarioCurso;
@@ -28,7 +31,7 @@ import java.util.Optional;
 @Controller
 public class AuthController {
     
-    private static final String MASTER_PASSWORD = "admin123"; // Contraseña maestra para crear administradores
+    private static final String MASTER_PASSWORD = "admin123";
     
     @Autowired
     private UsuarioService usuarioService;
@@ -39,68 +42,25 @@ public class AuthController {
     @Autowired
     private CursoService cursoService;
     
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    
     @GetMapping("/login")
     public String showLoginForm(Model model, @RequestParam(required = false) Boolean registroExitoso) {
-        model.addAttribute("usuario", new Usuario());
         if (Boolean.TRUE.equals(registroExitoso)) {
             model.addAttribute("mensajeExito", "¡Registro completado con éxito! Ya puedes iniciar sesión.");
         }
         return "auth/login";
     }
     
-    @PostMapping("/login")
-    public String login(@ModelAttribute Usuario usuario, HttpSession session, Model model) {
-        try {
-            if (usuarioService.autenticar(usuario.getEmail(), usuario.getContrasenya())) {
-                Optional<Usuario> usuarioOpt = usuarioService.findByEmail(usuario.getEmail());
-                if (!usuarioOpt.isPresent()) {
-                    model.addAttribute("error", "Usuario no encontrado");
-                    return "auth/login";
-                }
-                
-                Usuario usuarioAutenticado = usuarioOpt.get();
-                session.setAttribute("usuarioActual", usuarioAutenticado);
-                
-                if (usuarioService.esAdministrador(usuarioAutenticado)) {
-                    return "redirect:/homeAdmin";
-                } else {
-                    return "redirect:/home";
-                }
-            }
-            
-            model.addAttribute("error", "Credenciales inválidas");
-            return "auth/login";
-        } catch (Exception e) {
-            model.addAttribute("error", "Error durante el inicio de sesión: " + e.getMessage());
-            return "auth/login";
-        }
-    }
-    
     @GetMapping("/logout")
     public String logout(HttpSession session) {
+        SecurityContextHolder.clearContext();
         session.invalidate();
-        return "redirect:/login";
-    }
-    
-    @GetMapping("/home")
-    public String home(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioActual");
-        if (usuario == null) {
-            return "redirect:/login";
-        }
-        if (usuarioService.esAdministrador(usuario)) {
-            return "redirect:/homeAdmin";
-        }
-        return "home/userHome";
-    }
-    
-    @GetMapping("/homeAdmin")
-    public String homeAdmin(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioActual");
-        if (usuario == null || !usuarioService.esAdministrador(usuario)) {
-            return "redirect:/login";
-        }
-        return "home/adminHome";
+        return "redirect:/login?logout";
     }
     
     @GetMapping("/registro")
@@ -142,6 +102,9 @@ public class AuthController {
                 model.addAttribute("error", "El DNI ya está registrado");
                 return "auth/registro";
             }
+            
+            // Encriptar contraseña
+            usuario.setContrasenya(passwordEncoder.encode(usuario.getContrasenya()));
             
             // Manejar la foto
             if (fotoFile != null && !fotoFile.isEmpty()) {
